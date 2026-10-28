@@ -1,0 +1,8 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Local databases (regenerated on startup: products reseeded; simulate.py
+# or app usage creates the data file itself)
+data/*.db
