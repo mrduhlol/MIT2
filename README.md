@@ -23,54 +23,72 @@ npm install
 npm run dev
 ```
 
-## Deploy the full app to Cloudflare
+## Neon PostgreSQL setup
 
-The screenshot's error happened because `wrangler deploy` was run from the repository root,
-which had no deployment config. The frontend has since been deployed to
-<https://frontend.abhishek-a2534.workers.dev>. It currently serves the UI only. The full deploy
-will run FastAPI and the React assets together in one Python Worker, so the app uses that same
-Cloudflare-provided URL for both pages and `/api`.
-
-FastAPI needs persistent PostgreSQL; the local SQLite file is not durable on Workers. Create a
-PostgreSQL database (a Neon free project works for the hackathon), then create a Hyperdrive
-configuration in the Cloudflare dashboard using that database's connection details. Keep the
-database password in the provider/dashboard; do not put it in chat or commit it. Copy the
-Hyperdrive configuration ID into `commerce-testbed/backend/wrangler.jsonc`, replacing
-`CREATE_HYPERDRIVE_AND_REPLACE_THIS_ID`.
-
-From `commerce-testbed/backend`, install `uv` if needed, then deploy:
+The workspace is linked locally to Neon project `shy-term-30624525`, branch `production`.
+`neon.ts` declares Postgres only; the existing FastAPI login and session system is retained.
 
 ```bash
+npm install
+neon init -y --org-id org-lingering-union-88719333 --project-id shy-term-30624525 --branch production --services postgres
+neon deploy
+npm run build
+```
+
+Complete browser sign-in when prompted. `neon deploy` pulls `DATABASE_URL`,
+`DATABASE_URL_UNPOOLED`, and `NEON_BRANCH` into `.env.local` (or an existing `.env`).
+These files and `.neon` are git-ignored. Never expose database URLs through `VITE_*` variables.
+
+FastAPI reads workspace `.env.local` / `.env`, then backend `.env.local` / `.env`;
+process environment variables override file values. SQLAlchemy uses psycopg 3 with the pooled
+URL for application queries and the direct URL for schema initialization. SQLite remains the
+fallback when no database URL is configured. Existing SQLite users are not automatically migrated.
+
+Run the Neon-backed application in two terminals:
+
+```bash
+npm run dev:api  # http://127.0.0.1:8001
+npm run dev:web  # Vite UI; /api proxies to port 8001
+```
+
+Validate a running API, or the Vite frontend's API proxy:
+
+```bash
+cd commerce-testbed/backend
+.venv/bin/python -m scripts.smoke_test --base-url http://127.0.0.1:8001
+```
+
+The smoke test creates a synthetic account and order, checks login, saved addresses,
+products, cart/checkout, order persistence, event-feed permission checks, API-key revocation,
+and session revocation. It keeps the audit trail and does not print credentials.
+
+## Deploy the full app to Cloudflare
+
+The React assets and FastAPI API share <https://frontend.abhishek-a2534.workers.dev>.
+The backend's Hyperdrive binding connects to the Neon production database's direct endpoint;
+Hyperdrive pools connections, with query caching disabled. The Worker uses the pure-Python pg8000 driver and opens request-scoped connections without
+a client pool; local FastAPI uses psycopg 3.
+
+```bash
+npm run build
+cd commerce-testbed/backend
 npm ci
 uv sync --group dev
 uv run pywrangler deploy --dry-run
 uv run pywrangler secret put SECRET_KEY
 uv run pywrangler secret put AGENT_API_KEY
-```
-
-Each secret command prompts for its value. Use a randomly generated JWT key and a separate random
-agent key. Then build the frontend and publish the full stack:
-
-```bash
-cd ../frontend
-npm install
-npm run build:assets
-cd ../backend
 uv run pywrangler deploy
 ```
 
-The dry run validates packaging only; verify `/health`, registration/login, carts, orders, and
-API-key access on the deployed URL before treating the backend as working. Existing local
-SQLite accounts are not automatically migrated to PostgreSQL.
+The secret commands prompt privately. Use distinct random secrets; never commit them.
+Worker authentication uses Cloudflare runtime secrets, not the local Neon environment file.
+Only application sources are staged into `.worker-build`; virtual environments, local
+configuration, and test files are excluded from deployment. API docs are at `/docs`, and
+health is at `/api/security/health` or `/health`.
 
-The deploy updates the existing `frontend` Worker at
-<https://frontend.abhishek-a2534.workers.dev>. API docs will be at `/docs` and health at `/health`.
-After the full app works, add a custom domain from **Workers & Pages → frontend → Settings →
-Domains & Routes → Add → Custom Domain**. The domain's DNS zone must be active in the same
-Cloudflare account; Cloudflare provisions HTTPS.
-
-For local development, continue to run FastAPI with SQLite and the React Vite dev server. The
-Vite `/api` proxy remains pointed at `localhost:8000` unless `API_PROXY_TARGET` is set.
+After deployment, run the smoke test against the public HTTPS URL too. To attach your domain,
+open **Workers & Pages → frontend → Settings → Domains & Routes → Add → Custom Domain**.
+The domain's DNS zone must be active in the same Cloudflare account.
 
 ## Generate synthetic activity & incidents
 

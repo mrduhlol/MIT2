@@ -1,7 +1,12 @@
 from functools import lru_cache
 from contextvars import ContextVar, Token
+from pathlib import Path
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+_BACKEND_ROOT = Path(__file__).resolve().parents[1]
+_WORKSPACE_ROOT = _BACKEND_ROOT.parent.parent
 
 
 class Settings(BaseSettings):
@@ -15,9 +20,18 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     AGENT_API_KEY: str = "agent-dev-key-change-me"
     DATABASE_URL: str = "sqlite:///./data/app.db"
+    DATABASE_URL_UNPOOLED: str | None = None
     CORS_ORIGINS: str = "http://localhost:5173"
 
-    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+    model_config = SettingsConfigDict(
+        env_file=(
+            _WORKSPACE_ROOT / ".env.local",
+            _WORKSPACE_ROOT / ".env",
+            _BACKEND_ROOT / ".env.local",
+            _BACKEND_ROOT / ".env",
+        ),
+        extra="ignore",
+    )
 
 
 _request_settings: ContextVar[Settings | None] = ContextVar(

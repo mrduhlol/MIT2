@@ -1,7 +1,7 @@
 # commerce-testbed — Fake E-commerce Backend (AI Cyber Defense Agent Hackathon)
 
 An intentionally-instrumented fake e-commerce "test environment" built with
-FastAPI + SQLAlchemy 2.0 + SQLite. It produces a stream of realistic security
+FastAPI + SQLAlchemy 2.0 + SQLite locally or Neon PostgreSQL. It produces a stream of realistic security
 audit events (real app events + synthetic incidents) that an external AI cyber
 defense agent can monitor and analyze via `/api/events/feed`.
 
@@ -42,9 +42,9 @@ uvicorn app.main:app --reload --port 8000
 the React assets directly, and the app uses the `HYPERDRIVE` binding for
 persistent PostgreSQL. Do not deploy the local SQLite database file to Workers.
 
-Create a PostgreSQL database and a Hyperdrive configuration in Cloudflare, then replace the
-placeholder Hyperdrive ID in `wrangler.jsonc`. Set the two runtime secrets with `pywrangler
-secret put` and deploy from this directory; the root README has the full command sequence.
+The configured Hyperdrive connection points at the Neon production branch. Query caching is
+disabled. Set the two runtime secrets with `pywrangler secret put` and deploy from this
+directory; the root README has the Neon initialization and deployment command sequence.
 Tables and the product catalog initialize on the first request. Local development still uses
 SQLite and the usual `uvicorn` command above.
 
@@ -55,7 +55,8 @@ SQLite and the usual `uvicorn` command above.
 | `SECRET_KEY` | `dev-secret-change-me-not-for-production` | JWT signing secret (HS256) |
 | `ACCESS_TOKEN_EXPIRE_MINUTES` | `30` | Access token lifetime |
 | `AGENT_API_KEY` | `agent-dev-key-change-me` | Key for `/api/events/feed` |
-| `DATABASE_URL` | `sqlite:///./data/app.db` | SQLAlchemy DB URL |
+| `DATABASE_URL` | `sqlite:///./data/app.db` | Application DB URL; Neon pooled URL uses psycopg 3 |
+| `DATABASE_URL_UNPOOLED` | unset | Direct Neon URL for schema initialization |
 | `CORS_ORIGINS` | `http://localhost:5173` | Comma-separated exact browser origins allowed to call the API |
 
 For a hosted frontend, set `CORS_ORIGINS` to its HTTPS origin (for example,

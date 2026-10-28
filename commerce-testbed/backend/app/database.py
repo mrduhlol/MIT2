@@ -3,6 +3,7 @@ from contextvars import ContextVar, Token
 from typing import Iterator
 
 from sqlalchemy import create_engine, text
+from sqlalchemy.engine import make_url
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.pool import NullPool
 
@@ -11,10 +12,20 @@ from .models import Base, Product
 
 _settings = get_settings()
 
+
+def _database_url(value: str):
+    """Use the existing psycopg 3 driver for Neon PostgreSQL URLs."""
+    url = make_url(value)
+    if url.drivername in ("postgres", "postgresql"):
+        url = url.set(drivername="postgresql+psycopg")
+    return url
+
+
 _is_sqlite = _settings.DATABASE_URL.startswith("sqlite")
 
 engine = create_engine(
-    _settings.DATABASE_URL,
+    _database_url(_settings.DATABASE_URL),
+    pool_pre_ping=True,
     connect_args={"check_same_thread": False} if _is_sqlite else {},
 )
 
@@ -30,23 +41,23 @@ def configure_hyperdrive() -> None:
     """Configure SQLAlchemy to open PostgreSQL connections through Hyperdrive."""
     global engine, _worker_mode
 
-    import psycopg
+    import pg8000.dbapi
 
     def connect_from_hyperdrive():
         binding = _worker_hyperdrive.get()
         if binding is None:
             raise RuntimeError("Hyperdrive is unavailable for this request")
-        return psycopg.connect(
+        return pg8000.dbapi.connect(
             host=binding.host,
             port=int(binding.port),
             user=binding.user,
             password=binding.password,
-            dbname=binding.database,
-            sslmode="disable",
+            database=binding.database,
+            ssl_context=False,
         )
 
     engine = create_engine(
-        "postgresql+psycopg://",
+        "postgresql+pg8000://",
         creator=connect_from_hyperdrive,
         poolclass=NullPool,
     )
@@ -89,7 +100,19 @@ def init_db() -> None:
 
     from . import seed_data  # noqa: F401  (ensures module importable)
 
-    with engine.begin() as connection:
+    # Schema setup uses Neon's direct connection; normal queries stay pooled.
+    schema_engine = engine
+    if not _worker_mode and engine.dialect.name == "postgresql" and _settings.DATABASE_URL_UNPOOLED:
+        schema_engine = create_engine(_database_url(_settings.DATABASE_URL_UNPOOLED), poolclass=NullPool)
+    try:
+        _initialize_schema(schema_engine)
+    finally:
+        if schema_engine is not engine:
+            schema_engine.dispose()
+
+
+def _initialize_schema(schema_engine) -> None:
+    with schema_engine.begin() as connection:
         if connection.dialect.name == "postgresql":
             # Serialize schema/catalog setup across simultaneously starting Workers.
             connection.execute(text("SELECT pg_advisory_xact_lock(73420819)"))

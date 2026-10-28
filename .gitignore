@@ -1,1 +1,8 @@
 .cloudflare/
+.neon
+node_modules/
+
+# Neon credentials and local runtime configuration
+.env
+.env.*
+!.env.example
