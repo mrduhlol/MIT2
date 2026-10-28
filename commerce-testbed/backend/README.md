@@ -55,6 +55,29 @@ python scripts/simulate.py --db ./data/app.db   # optional explicit DB path
 
 The simulator runs in seconds and writes directly to the DB:
 
+## Demo account (seeded via the real API — nothing mocked)
+
+A ready-to-log-in demo user exists in the local database:
+
+| Field | Value |
+|---|---|
+| Email | `demo@amezon.com` |
+| Password | `AmezonDemo2026!` |
+
+It was created through the public register/login endpoints, so its password is stored as a bcrypt
+hash like every other account, and it already has a default address (Bengaluru 560001) and three
+placed orders. Log in on the website, or via API:
+
+```bash
+curl -X POST http://localhost:8000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"demo@amezon.com","password":"AmezonDemo2026!"}'
+```
+
+```
+
+The simulator runs in seconds and writes directly to the DB:
+
 - ~8 synthetic users with normal login/browsing/order activity over the past 7 days
 - **Credential stuffing incident**: one IP, ~150 `login_failure` events across
   many different attempted email hashes within a 10-minute window (severity medium)
