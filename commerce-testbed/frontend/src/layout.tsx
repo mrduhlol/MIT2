@@ -95,12 +95,13 @@ export function Header() {
   const [query, setQuery] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
+  const isAdminPortal = location.pathname.startsWith("/admin");
   const menuRef = useRef<HTMLDivElement>(null);
   const [deliverCity, setDeliverCity] = useState<string | null>(null);
 
   // Fetch the default address once per login for the "Deliver to" chip.
   useEffect(() => {
-    if (!token) {
+    if (!token || isAdminPortal) {
       setDeliverCity(null);
       return;
     }
@@ -110,7 +111,7 @@ export function Header() {
         setDeliverCity(preferred?.city ?? null);
       })
       .catch(() => setDeliverCity(null));
-  }, [token]);
+  }, [token, isAdminPortal]);
 
   // sync cart badge from cart responses cached in localStorage (see CartContext section)
   useEffect(() => {
@@ -136,7 +137,7 @@ export function Header() {
   }, []);
 
   async function bumpCartCount() {
-    if (!token) return;
+    if (!token || isAdminPortal) return;
     try {
       const cart = await api<Cart>("/api/cart");
       syncCartCount(cart.items.reduce((sum, it) => sum + it.quantity, 0));

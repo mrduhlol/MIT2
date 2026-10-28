@@ -66,7 +66,7 @@ and session revocation. It keeps the audit trail and does not print credentials.
 
 The React assets and FastAPI API share <https://frontend.abhishek-a2534.workers.dev>.
 
-Current verification: the build, all 28 automated tests, and the complete Neon-backed local
+Current verification: the build, all 31 automated tests, and the complete Neon-backed local
 API/frontend-proxy smoke tests pass. Public storefront/docs and individual API flows work,
 but the complete public smoke test has intermittently failed with HTTP 503 on login/logout.
 Runtime logs also captured Cloudflare Python `NoGilError`; public reliability is not yet verified.

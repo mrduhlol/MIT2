@@ -3,7 +3,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from pydantic import BaseModel
 from sqlalchemy import String, cast, func, or_, select
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
 
 from ..audit import log_event
 from ..database import get_db
@@ -54,6 +54,8 @@ def records(resource: str, request: Request, limit: int = Query(50, ge=1, le=100
         raise HTTPException(404, "Unknown dashboard")
     model, columns = RESOURCES[resource]
     query = db.query(model)
+    if model is User:
+        query = query.options(selectinload(User.admin_role))
     if q:
         searchable = [getattr(model, name) for name in ("email", "full_name", "name", "status", "event_type", "source", "severity", "pseudo_user") if hasattr(model, name)]
         searchable.extend(cast(getattr(model, name), String) for name in ("id", "user_id") if hasattr(model, name))
