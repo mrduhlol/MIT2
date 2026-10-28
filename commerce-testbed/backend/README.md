@@ -87,12 +87,133 @@ Query parameters: `since` (ISO-8601 timestamp, only rows with `ts >= since`),
 401; wrong key → 403. Successful agent access is logged at most once per 5
 minutes as an `event_feed_access` event.
 
+## AI SOC / API Key Integration
+
+Per-user API keys let an external AI SOC agent authenticate against
+`/api/security/*` endpoints. Keys are managed with the regular session JWT
+(`Authorization: Bearer <access-token>`), are strictly owner-scoped, and
+coexist with the legacy shared-agent-key feed above (which stays).
+
+### Scopes
+
+| Scope                  | Grants                                                                 |
+|------------------------|------------------------------------------------------------------------|
+| `security_events:read` | `GET /api/security/events`, `GET /api/security/incidents` needs `incidents:read` |
+| `security_events:write`| `POST /api/security/events`                                            |
+| `incidents:read`       | `GET /api/security/incidents`                                          |
+| `users:read`           | `GET /api/security/users` (pseudonymous metadata only, no PII)         |
+
+Keys carry **no admin scope**; least privilege applies — only explicitly
+selected scopes are granted, unknown scopes are rejected, and an empty scope
+list is rejected.
+
+### Key lifecycle (create → one-time display)
+
+`POST /api/api-keys` returns the full plaintext secret **exactly once**. Only
+the SHA-256 hash of the secret is stored; a secret can never be retrieved,
+listed, or logged again. Losing it means rotating or creating a new key.
+
+```bash
+curl -X POST "http://localhost:8000/api/api-keys" \
+  -H "Authorization: Bearer <session-access-token>" \
+  -H "Content-Type: application/json" \
+  -d '{"name": "SOC agent", "environment": "development",
+       "scopes": ["security_events:read", "security_events:write"]}'
+```
+
+```json
+{
+  "key": {
+    "id": 1, "key_id": "key_ab12cd34ef56", "name": "SOC agent",
+    "environment": "development", "scopes": ["security_events:read", "security_events:write"],
+    "visible_prefix": "sk_test_xYz12ab", "status": "active",
+    "created_at": "...", "expires_at": null, "revoked_at": null, "last_used_at": null
+  },
+  "secret": "sk_test_xYz12ab000000000000000000000000000000"
+}
+```
+
+Development keys use the `sk_test_` prefix, production keys `sk_live_`.
+`GET /api/api-keys` lists only the caller's own keys (same shape as `key`
+above — never the secret). `DELETE /api/api-keys/{id}` revokes (idempotent,
+`{"ok": true}`); `POST /api/api-keys/{id}/rotate` atomically revokes the old
+key and returns a replacement with the same name/environment/scopes and a
+fresh one-time secret (expiry: 365 days, or the remaining original duration).
+
+### Authenticating SOC endpoints
+
+Pass the key secret itself (never the JWT):
+
+```bash
+curl -H "Authorization: Bearer sk_test_..." "http://localhost:8000/api/security/ping"
+# or:
+curl -H "X-API-Key: sk_test_..." "http://localhost:8000/api/security/ping"
+```
+
+### Endpoints
+
+| Endpoint | Scope | Description |
+|---|---|---|
+| `GET /api/security/ping` | none | Connection test: verifies key validity, returns key metadata |
+| `GET /api/security/events` | `security_events:read` | Event stream, newest first; params `since`, `until`, `limit` (default 100, max 1000), `offset`, `severity`, `source` (`app`/`synthetic`/`external`/default `all`), `event_type` |
+| `POST /api/security/events` | `security_events:write` | Ingest an external event; `source` is forced to `external`, server records its own timestamp |
+| `GET /api/security/incidents` | `incidents:read` | Derived, read-only incident view (no new tables): high-severity event groups + synthesized "Possible credential stuffing" per IP |
+| `GET /api/security/users` | `users:read` | Pseudonymous account metadata only — **no PII** (no emails/phones/names) |
+
+Connection test:
+
+```bash
+curl -H "Authorization: Bearer sk_test_..." "http://localhost:8000/api/security/ping"
+# → {"authenticated": true, "key_id": "key_ab12cd34ef56", "key_name": "SOC agent",
+#    "environment": "development", "scopes": [...], "user_pseudo": "..."}
+```
+
+Ingest an event (client-supplied `source` fields are rejected 422; details
+must not contain sensitive keys such as `password`/`token`/`secret` and must
+never echo the API key secret itself):
+
+```json
+POST /api/security/events
+{"event_type": "brute_force_attempt", "severity": "medium",
+ "pseudo_user": "victim-pseudo-123", "details": {"ip_reputation": "bad"}}
+→ {"id": 42, "ts": "2026-...", "event_type": "brute_force_attempt",
+   "source": "external", "severity": "medium", "status": "accepted"}
+```
+
+### Error responses
+
+| Status | Detail | Meaning |
+|---|---|---|
+| 401 | `API key required` | Missing or malformed auth header |
+| 401 | `Invalid API key` | Unknown key / wrong secret |
+| 401 | `API key revoked` | Key was revoked by its owner |
+| 401 | `API key expired` | Key past `expires_at` |
+| 401 | `API key owner inactive` | Owning account deactivated |
+| 403 | `Insufficient permissions: requires '<scope>'` | Key lacks the required scope |
+| 429 | `Rate limit exceeded` + `Retry-After` header/body | Per-key limit: 120 reads/min, 30 writes/min |
+
+Rate limiting is a simple in-process sliding window in this single-process
+testbed; production deployments should use a shared store (e.g. Redis).
+
+### TLS
+
+In production terminate TLS at the reverse proxy (uvicorn behind nginx), or
+for direct TLS:
+
+```bash
+uvicorn app.main:app --port 443 --ssl-keyfile ./key.pem --ssl-certfile ./cert.pem
+```
+
+API-key secrets must never travel over plain HTTP.
+
 ## Event types
 
 `account_created`, `login_success`, `login_failure`, `session_created`,
 `session_revoked`, `suspicious_login_activity`, `profile_updated`,
 `password_changed`, `password_change_failed`, `address_changed`, `cart_updated`,
-`order_placed`, `access_denied`, `event_feed_access`.
+`order_placed`, `access_denied`, `event_feed_access`, plus API-key activity:
+`api_key_created`, `api_key_rotated`, `api_key_revoked`, `api_key_used`,
+`rate_limit_triggered`, and externally ingested events (source `external`).
 
 ## API overview (all under `/api`)
 
@@ -107,6 +228,8 @@ minutes as an `event_feed_access` event.
 - `POST /api/cart/checkout` `{shipping_address_id, payment_method_display}`
 - `GET /api/orders`, `GET /api/orders/{id}`
 - `GET /api/events/feed` (agent key only)
+- `GET/POST /api/api-keys`, `DELETE /api/api-keys/{id}`, `POST /api/api-keys/{id}/rotate` (session JWT)
+- `GET /api/security/ping|events|incidents|users`, `POST /api/security/events` (API key)
 - `GET /api/security/health`, `GET /health`
 
 Protected endpoints use `Authorization: Bearer <access-token>`.

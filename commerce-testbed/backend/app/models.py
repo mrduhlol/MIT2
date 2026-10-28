@@ -31,6 +31,7 @@ class User(Base):
     sessions = relationship("SessionRecord", back_populates="user", cascade="all, delete-orphan")
     cart_items = relationship("CartItem", back_populates="user", cascade="all, delete-orphan")
     orders = relationship("Order", back_populates="user")
+    api_keys = relationship("ApiKey", back_populates="user", cascade="all, delete-orphan")
 
 
 class Address(Base):
@@ -137,3 +138,30 @@ class SecurityEvent(Base):
     user_agent: Mapped[str | None] = mapped_column(String(255), nullable=True)
     # JSON-encoded details (never contains passwords, tokens, or raw emails).
     details: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+
+class ApiKey(Base):
+    __tablename__ = "api_keys"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    # Public identifier ("key_" + 16 hex chars); safe to display and audit-log.
+    key_id: Mapped[str] = mapped_column(String(32), unique=True, index=True)
+    name: Mapped[str] = mapped_column(String(128))
+    # "development" | "production"
+    environment: Mapped[str] = mapped_column(String(16), default="development")
+    # JSON-encoded list of scope strings (see app.api_keys.SCOPES).
+    scopes: Mapped[str] = mapped_column(Text, default="[]")
+    # First 14 chars of the secret, e.g. "sk_test_xYz12ab", for identification.
+    visible_prefix: Mapped[str] = mapped_column(String(32))
+    # sha256 hex digest of the FULL secret. The secret is a high-entropy random
+    # token, so an unsalted fast hash is acceptable and enables exact-match
+    # lookup; verification compares digests with hmac.compare_digest.
+    hashed_secret: Mapped[str] = mapped_column(String(64), index=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
+    expires_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    revoked_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    last_used_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    last_used_ip: Mapped[str | None] = mapped_column(String(64), nullable=True)
+
+    user = relationship("User", back_populates="api_keys")

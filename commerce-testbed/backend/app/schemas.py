@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
 
@@ -186,3 +186,74 @@ class EventOut(BaseModel):
 
 class FeedResponse(BaseModel):
     events: list[EventOut]
+
+
+# ---------- API keys (AI SOC integration) ----------
+
+class ApiKeyCreate(BaseModel):
+    name: str = Field(min_length=1, max_length=128)
+    environment: Literal["development", "production"] = "development"
+    # Least privilege: only explicitly selected scopes; unknown scopes rejected.
+    scopes: list[str] = Field(min_length=1)
+    expires_at: datetime | None = None
+
+    @field_validator("scopes")
+    @classmethod
+    def scopes_are_known(cls, v: list[str]) -> list[str]:
+        from .api_keys import SCOPES
+
+        unknown = [s for s in v if s not in SCOPES]
+        if unknown:
+            raise ValueError(
+                f"Unknown scopes: {', '.join(unknown)}. Allowed: {', '.join(SCOPES)}"
+            )
+        if len(set(v)) != len(v):
+            raise ValueError("Duplicate scopes are not allowed")
+        return v
+
+
+class ApiKeyOut(BaseModel):
+    id: int
+    key_id: str
+    name: str
+    environment: str
+    scopes: list[str]
+    visible_prefix: str
+    status: str
+    created_at: datetime
+    expires_at: datetime | None
+    revoked_at: datetime | None
+    last_used_at: datetime | None
+
+
+class ApiKeyListResponse(BaseModel):
+    items: list[ApiKeyOut]
+
+
+class ApiKeyCreatedResponse(BaseModel):
+    key: ApiKeyOut
+    # One-time plaintext secret — never stored, never returned again.
+    secret: str
+
+
+# ---------- AI SOC security endpoints ----------
+
+class SecurityEventIn(BaseModel):
+    """Strict external-event ingestion schema (source is always forced to
+    "external"; clients may not set it)."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    event_type: str = Field(min_length=1, max_length=64, pattern=r"^[a-z][a-z0-9_.:]{0,63}$")
+    severity: Literal["low", "medium", "high"] = "low"
+    request_id: str | None = Field(default=None, max_length=64)
+    pseudo_user: str | None = Field(default=None, max_length=64)
+    ts: str | None = None
+    details: dict[str, Any] | None = None
+
+
+class SecurityEventsResponse(BaseModel):
+    items: list[EventOut]
+    total: int
+    limit: int
+    offset: int
