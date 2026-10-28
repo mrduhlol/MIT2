@@ -6,3 +6,7 @@ node_modules/
 .env
 .env.*
 !.env.example
+
+# Generated Python vendor bundle for root Cloudflare deployments
+python_modules/
+.wrangler/

@@ -64,6 +64,29 @@ and session revocation. It keeps the audit trail and does not print credentials.
 
 ## Deploy the full app to Cloudflare
 
+For Cloudflare Workers Builds, use these settings:
+
+- **Root directory:** repository root (`/`)
+- **Build command:** leave blank (the Worker custom build prepares everything)
+- **Deploy command:** `npx wrangler deploy` (or `npm run deploy`)
+- **Worker name:** `frontend`
+
+The root `wrangler.jsonc` runs `scripts/prepare-deploy.mjs`: installs locked frontend/backend
+Node dependencies, bootstraps pinned uv without changing shell profiles, installs Python
+build tools, vendors Worker-compatible Python packages, builds React, and stages FastAPI.
+Only generated runtime packages and app sources are uploaded. Runtime secrets `SECRET_KEY`
+and `AGENT_API_KEY` must remain configured on the Worker; Neon credentials are accessed through
+its existing Hyperdrive binding. No Neon login or `.env.local` is needed during CI builds.
+
+To reproduce the same deployment from the repository root:
+
+```bash
+npm ci
+npm run deploy:dry-run
+npm run deploy
+```
+
+
 The React assets and FastAPI API share <https://frontend.abhishek-a2534.workers.dev>.
 
 Current verification: the build, all 31 automated tests, and the complete Neon-backed local

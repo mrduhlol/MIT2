@@ -6,10 +6,15 @@
   "name": "amezon-workspace",
   "private": true,
   "scripts": {
-    "build": "npm --prefix commerce-testbed/frontend run build:assets",
+    "build": "node scripts/build-frontend.mjs",
     "dev:api": "cd commerce-testbed/backend && .venv/bin/python -m uvicorn app.main:app --host 127.0.0.1 --port 8001",
     "dev:web": "API_PROXY_TARGET=http://127.0.0.1:8001 npm --prefix commerce-testbed/frontend run dev",
     "test": "cd commerce-testbed/backend && .venv/bin/python -m pytest -q",
-    "neon:deploy": "neon deploy"
+    "neon:deploy": "neon deploy",
+    "deploy": "wrangler deploy",
+    "deploy:dry-run": "wrangler deploy --dry-run"
+  },
+  "devDependencies": {
+    "wrangler": "4.154.0"
   }
 }
