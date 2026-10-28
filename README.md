@@ -158,3 +158,10 @@ cd commerce-testbed/backend
 The setup command creates the additive admin-role table, stores only a bcrypt password hash,
 and revokes existing sessions when resetting an account. There are no built-in admin passwords
 or email-based privilege bypasses. Credentials are not stored in repository files.
+
+## Currency
+
+All storefront, cart, checkout, order-history, and admin amounts display in Indian rupees
+(INR / ₹) with Indian digit grouping. Monetary database/API fields keep their legacy
+`*_cents` names for compatibility; their integer values represent paise (100 paise = ₹1).
+Existing numeric prices and order amounts are retained; this is not an exchange-rate conversion.

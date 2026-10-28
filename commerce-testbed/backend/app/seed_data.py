@@ -1,5 +1,6 @@
 """Seed data: ~40 realistic products across categories."""
 
+# Prices are integer paise (INR); price_cents is the legacy API field name.
 # (name, category, price_cents, description, stock)
 PRODUCTS = [
     # --- Electronics ---

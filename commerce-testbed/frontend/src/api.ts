@@ -45,10 +45,11 @@ export class ApiError extends Error {
   }
 }
 
-export function formatPrice(cents: number): string {
-  return (cents / 100).toLocaleString("en-US", {
+// Monetary API fields retain their legacy *_cents names; values are INR paise.
+export function formatPrice(paise: number): string {
+  return (paise / 100).toLocaleString("en-IN", {
     style: "currency",
-    currency: "USD",
+    currency: "INR",
   });
 }
 

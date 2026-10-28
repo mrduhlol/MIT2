@@ -18,7 +18,11 @@ const labels: Record<string, string> = {
   order_value_cents: "Order value", api_keys: "API keys", security_events: "Security events",
   high_severity_events: "High severity events", cart_items: "Items in carts",
 };
-function label(value: string) { return value.replaceAll("_", " ").replace(/^./, (c) => c.toUpperCase()); }
+function label(value: string) {
+  const monetary = value.endsWith("_cents");
+  const title = (monetary ? value.slice(0, -6) : value).replaceAll("_", " ").replace(/^./, (c) => c.toUpperCase());
+  return monetary ? `${title} (₹)` : title;
+}
 function display(key: string, value: Row[string]) {
   if (value === null) return "—";
   if (key === "is_admin") return value ? "Admin" : "Customer";
