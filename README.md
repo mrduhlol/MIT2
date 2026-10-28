@@ -65,6 +65,12 @@ and session revocation. It keeps the audit trail and does not print credentials.
 ## Deploy the full app to Cloudflare
 
 The React assets and FastAPI API share <https://frontend.abhishek-a2534.workers.dev>.
+
+Current verification: the build, all 28 automated tests, and the complete Neon-backed local
+API/frontend-proxy smoke tests pass. Public storefront/docs and individual API flows work,
+but the complete public smoke test has intermittently failed with HTTP 503 on login/logout.
+Runtime logs also captured Cloudflare Python `NoGilError`; public reliability is not yet verified.
+See [Cloudflare runtime issue #6624](https://github.com/cloudflare/workerd/issues/6624).
 The backend's Hyperdrive binding connects to the Neon production database's direct endpoint;
 Hyperdrive pools connections, with query caching disabled. The Worker uses the pure-Python pg8000 driver and opens request-scoped connections without
 a client pool; local FastAPI uses psycopg 3.
