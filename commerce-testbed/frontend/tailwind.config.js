@@ -4,12 +4,12 @@ export default {
   theme: {
     extend: {
       colors: {
-        accent: "#e47911",
-        "accent-dark": "#c26a0d",
-        cta: "#FFD814",
-        "cta-dark": "#F7CA00",
-        navy: "#131921",
-        "navy-light": "#232f3e",
+        accent: "#0f766e",
+        "accent-dark": "#115e59",
+        cta: "#0f766e",
+        "cta-dark": "#115e59",
+        navy: "#173c38",
+        "navy-light": "#24534d",
       },
       fontFamily: {
         sans: [

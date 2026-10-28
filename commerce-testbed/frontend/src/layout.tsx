@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
 import { api } from "./api";
-import type { Address, Cart } from "./types";
+import type { Cart } from "./types";
 import { cn } from "./utils";
 
 /* --------------------------------- Icons ----------------------------------- */
@@ -37,56 +37,16 @@ function CartIcon({ className }: { className?: string }) {
   );
 }
 
-function PinIcon({ className }: { className?: string }) {
-  return (
-    <svg {...iconProps} className={className}>
-      <path d="M12 21s-6.5-5.4-6.5-10a6.5 6.5 0 1 1 13 0c0 4.6-6.5 10-6.5 10z" />
-      <circle cx="12" cy="10.5" r="2.2" />
-    </svg>
-  );
-}
-
-function MenuIcon({ className }: { className?: string }) {
-  return (
-    <svg {...iconProps} className={className}>
-      <path d="M4 6.5h16M4 12h16M4 17.5h16" />
-    </svg>
-  );
-}
-
-/* ------------------------------ Amezon wordmark ----------------------------- */
-
-export function AmezonLogo({ className }: { className?: string }) {
-  return (
-    <span className={cn("relative inline-flex flex-col items-start", className)}>
-      <span className="text-xl font-bold leading-none tracking-tight">amezon</span>
-      <svg
-        viewBox="0 0 64 11"
-        className="mt-[3px] h-2 w-full text-[#FF9900]"
-        fill="none"
-        aria-hidden="true"
-      >
-        <path
-          d="M2 2.5C17 10 44 10 59 2"
-          stroke="currentColor"
-          strokeWidth="3"
-          strokeLinecap="round"
-        />
-        <path
-          d="M56.2 1.2l4.2 0.6-1.5 3.4"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-    </span>
-  );
+export function ShopLogo({ className }: { className?: string }) {
+  return <span className={cn("inline-flex items-center gap-2.5 font-semibold tracking-tight", className)}>
+    <span className="grid h-9 w-9 place-items-center rounded-xl bg-accent text-white"><CartIcon className="h-5 w-5" /></span>
+    <span className="text-xl">Little Cart</span>
+  </span>;
 }
 
 /* ------------------------------ Header ------------------------------------- */
 
-const DEPARTMENTS = ["Electronics", "Home & Kitchen", "Books", "Sports", "Toys", "Beauty"];
+
 
 export function Header() {
   const { user, token, logout } = useAuth();
@@ -97,22 +57,6 @@ export function Header() {
   const location = useLocation();
   const isAdminPortal = location.pathname.startsWith("/admin");
   const menuRef = useRef<HTMLDivElement>(null);
-  const [deliverCity, setDeliverCity] = useState<string | null>(null);
-
-  // Fetch the default address once per login for the "Deliver to" chip.
-  useEffect(() => {
-    if (!token || isAdminPortal) {
-      setDeliverCity(null);
-      return;
-    }
-    api<Address[]>("/api/me/addresses")
-      .then((list) => {
-        const preferred = list.find((a) => a.is_default) ?? list[0];
-        setDeliverCity(preferred?.city ?? null);
-      })
-      .catch(() => setDeliverCity(null));
-  }, [token, isAdminPortal]);
-
   // sync cart badge from cart responses cached in localStorage (see CartContext section)
   useEffect(() => {
     const sync = () => {
@@ -159,54 +103,41 @@ export function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-40 border-b border-slate-800 bg-navy text-white shadow">
-      <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-2 sm:gap-4">
-        <Link to="/" className="flex shrink-0 items-center gap-2 rounded-lg px-1.5 py-1 text-white hover:opacity-90">
-          <AmezonLogo />
+    <header className="sticky top-0 z-40 border-b border-gray-200 bg-white text-slate-800">
+      <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-3 px-4 py-4 sm:gap-6">
+        <Link to="/" className="flex shrink-0 items-center gap-2 rounded-lg px-1.5 py-1 text-slate-900 hover:opacity-90">
+          <ShopLogo />
         </Link>
 
-        <Link
-          to={user ? "/account/addresses" : "/login?next=%2Faccount%2Faddresses"}
-          className="hidden shrink-0 items-center gap-1 rounded-lg px-2 py-1 text-xs text-white hover:bg-navy-light md:flex"
-        >
-          <PinIcon className="h-4 w-4 self-center text-slate-200" />
-          <span className="leading-tight">
-            <span className="block text-[11px] text-slate-300">{user ? "Deliver to" : "Hello"}</span>
-            <span className="block max-w-[9rem] truncate font-bold">
-              {user ? (deliverCity ?? "add address") : "sign in"}
-            </span>
-          </span>
-        </Link>
-
-        <form className="flex min-w-0 flex-1" onSubmit={submitSearch}>
+        <form className="order-last flex w-full min-w-0 sm:order-none sm:w-auto sm:flex-1" onSubmit={submitSearch}>
           <div className="flex w-full overflow-hidden rounded-md shadow-sm ring-1 ring-transparent focus-within:ring-2 focus-within:ring-cta">
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search Amezon…"
-              aria-label="Search Amezon"
-              className="min-w-0 flex-1 border-0 bg-white px-3 py-2 text-sm text-slate-800 placeholder-slate-400 focus:outline-none"
+              placeholder="Search products…"
+              aria-label="Search products"
+              className="min-w-0 flex-1 border-0 bg-gray-50 px-3 py-2.5 text-sm text-slate-800 placeholder-slate-400 focus:outline-none"
             />
             <button
               type="submit"
               aria-label="Search"
-              className="bg-cta px-4 text-navy transition-colors hover:bg-cta-dark"
+              className="bg-accent px-4 text-white transition-colors hover:bg-cta-dark"
             >
               <SearchIcon className="h-5 w-5" />
             </button>
           </div>
         </form>
 
-        <nav className="flex shrink-0 items-center gap-1">
+        <nav className="ml-auto flex shrink-0 items-center gap-1">
           {user ? (
             <div className="relative" ref={menuRef}>
               <button
                 onClick={() => setMenuOpen((o) => !o)}
                 aria-haspopup="menu"
                 aria-expanded={menuOpen}
-                className="flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm font-medium text-white hover:bg-navy-light"
+                className="flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm font-medium text-slate-700 hover:bg-gray-100"
               >
-                <span className="grid h-7 w-7 place-items-center rounded-full bg-accent text-xs font-bold uppercase">
+                <span className="grid h-7 w-7 place-items-center rounded-full bg-accent text-white text-xs font-bold uppercase">
                   {user.full_name?.[0] ?? user.email[0]}
                 </span>
                 <span className="hidden max-w-[10rem] truncate md:block">
@@ -259,7 +190,7 @@ export function Header() {
             <>
               <Link
                 to="/login"
-                className="rounded-lg px-3 py-2 text-sm font-medium text-white hover:bg-navy-light"
+                className="rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-gray-100"
               >
                 Login
               </Link>
@@ -273,12 +204,12 @@ export function Header() {
           )}
           <Link
             to="/cart"
-            className="relative flex items-end gap-1.5 rounded-lg px-2.5 py-1.5 text-sm font-bold text-white hover:bg-navy-light"
+            className="relative flex items-end gap-1.5 rounded-lg px-2.5 py-1.5 text-sm font-bold text-slate-700 hover:bg-gray-100"
           >
             <span className="relative">
               <CartIcon className="h-6 w-6" />
               {cartCount > 0 && (
-                <span className="absolute -top-1 left-1/2 grid h-4 min-w-4 -translate-x-1/2 place-items-center rounded-full bg-cta px-0.5 text-[10px] font-bold text-navy">
+                <span className="absolute -top-1 left-1/2 grid h-4 min-w-4 -translate-x-1/2 place-items-center rounded-full bg-accent px-0.5 text-[10px] font-bold text-white">
                   {cartCount}
                 </span>
               )}
@@ -288,30 +219,10 @@ export function Header() {
         </nav>
       </div>
 
-      {/* department sub-navigation */}
-      <div className="border-t border-navy-light bg-navy-light text-white">
-        <div className="mx-auto flex max-w-7xl items-center gap-0.5 overflow-x-auto px-2 py-1 text-sm sm:px-4">
-          <Link
-            to="/"
-            className="flex shrink-0 items-center gap-1.5 rounded px-2 py-1.5 font-medium hover:bg-white/10"
-          >
-            <MenuIcon className="h-4 w-4" />
-            All
-          </Link>
-          {DEPARTMENTS.map((c) => (
-            <Link
-              key={c}
-              to={`/?category=${encodeURIComponent(c)}`}
-              className={cn(
-                "shrink-0 rounded px-2 py-1.5 hover:bg-white/10",
-                new URLSearchParams(location.search).get("category") === c
-                  ? "bg-white/10 font-semibold ring-1 ring-white/30"
-                  : "",
-              )}
-            >
-              {c}
-            </Link>
-          ))}
+      <div className="border-t border-gray-100 bg-gray-50">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-2 text-xs text-slate-500">
+          <span>Shopping demo · No real payments</span>
+          <Link to="/" className="font-medium text-accent hover:underline">Browse products</Link>
         </div>
       </div>
     </header>
@@ -330,60 +241,16 @@ export function Layout({ children }: { children: ReactNode }) {
     <div className="flex min-h-screen flex-col">
       <Header />
       <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-6">{children}</main>
-      <footer>
-        <button
-          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-          className="w-full bg-[#37475a] py-3 text-sm font-medium text-white transition-colors hover:bg-[#485769]"
-        >
-          Back to top
-        </button>
-        <div className="bg-navy-light text-slate-200">
-          <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 text-sm sm:grid-cols-2 lg:grid-cols-4">
-            <div>
-              <AmezonLogo className="text-white" />
-              <p className="mt-3 max-w-xs text-xs leading-relaxed text-slate-400">
-                A working marketplace testbed for the AI Cyber Defense Agent:
-                real backend, real database, observable security events.
-              </p>
-            </div>
-            <div>
-              <h3 className="mb-2 text-sm font-bold text-white">Your Amezon</h3>
-              <ul className="space-y-1.5">
-                <li><Link to="/account" className="hover:underline">Your Account</Link></li>
-                <li><a href="/images/products/credits.html" className="hover:underline">Product image credits</a></li>
-                <li><Link to="/orders" className="hover:underline">Your Orders</Link></li>
-                <li><Link to="/account/addresses" className="hover:underline">Saved Addresses</Link></li>
-                <li><Link to="/cart" className="hover:underline">Your Cart</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="mb-2 text-sm font-bold text-white">Amezon for Builders</h3>
-              <ul className="space-y-1.5">
-                <li><Link to="/account/developer" className="hover:underline">Developer API Keys</Link></li>
-                <li>
-                  <a href="http://localhost:8000/docs" target="_blank" rel="noreferrer" className="hover:underline">
-                    API Documentation
-                  </a>
-                </li>
-                <li>
-                  <a href="http://localhost:8000/api/security/health" target="_blank" rel="noreferrer" className="hover:underline">
-                    Service Health
-                  </a>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="mb-2 text-sm font-bold text-white">Testbed Notices</h3>
-              <ul className="space-y-1.5 text-xs leading-relaxed text-slate-400">
-                <li>All payments are synthetic — no real charges.</li>
-                <li>Security events are logged pseudonymously for the AI SOC feed.</li>
-                <li>Amezon is a hackathon project and is not affiliated with Amazon.</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-        <div className="bg-navy py-4 text-center text-xs text-slate-400">
-          © {new Date().getFullYear()} Amezon — hackathon testbed storefront. Synthetic payments, no real charges.
+      <footer className="mt-12 border-t border-gray-200 bg-white">
+        <div className="mx-auto flex max-w-7xl flex-col justify-between gap-6 px-4 py-8 sm:flex-row">
+          <div><ShopLogo /><p className="mt-3 max-w-sm text-sm leading-relaxed text-slate-500">A simple shopping demo for our hackathon. Browse, save a cart, and try a test order. No real charges.</p></div>
+          <nav aria-label="Footer" className="flex flex-wrap content-start gap-x-6 gap-y-3 text-sm text-slate-600">
+            <Link to="/account" className="hover:text-accent">Account</Link>
+            <Link to="/orders" className="hover:text-accent">Orders</Link>
+            <Link to="/account/developer" className="hover:text-accent">API keys</Link>
+            <a href="/docs" className="hover:text-accent">API docs</a>
+            <a href="/images/products/credits.html" className="hover:text-accent">Image credits</a>
+          </nav>
         </div>
       </footer>
     </div>

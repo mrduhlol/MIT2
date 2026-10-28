@@ -1,7 +1,7 @@
 import { useState, type FormEvent, type ReactNode } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { AmezonLogo } from "../layout";
+import { ShopLogo } from "../layout";
 import { ApiError } from "../api";
 import { Button, Input } from "../components/ui";
 
@@ -9,18 +9,15 @@ function AuthCard({ title, subtitle, children }: { title: string; subtitle?: Rea
   return (
     <div className="mx-auto flex max-w-md flex-col items-center px-4 py-10">
       <Link to="/" className="mb-6 flex items-center gap-2 text-slate-900">
-        <span className="grid h-10 w-10 place-items-center rounded-xl bg-navy pb-0.5">
-          <span className="text-xl font-bold leading-none text-white">a</span>
-        </span>
-        <AmezonLogo />
+        <ShopLogo />
       </Link>
-      <div className="w-full rounded-xl border border-gray-200 bg-white p-8 shadow-md">
+      <div className="w-full rounded-xl border border-gray-200 bg-white p-6 sm:p-8">
         <h1 className="mb-1 text-xl font-bold text-slate-900">{title}</h1>
         {subtitle && <p className="mb-5 text-sm text-slate-500">{subtitle}</p>}
         {children}
       </div>
       <p className="mt-6 text-center text-xs text-slate-500">
-        Hackathon test environment — data is synthetic.
+        Hackathon demo. Use test details; no real payments.
       </p>
     </div>
   );
@@ -56,7 +53,7 @@ export function LoginPage() {
   }
 
   return (
-    <AuthCard title="Log in" subtitle="Welcome back to Amezon">
+    <AuthCard title="Log in" subtitle="Welcome back to Little Cart">
       <form onSubmit={onSubmit} className="space-y-4">
         <Input
           label="Email"
@@ -86,7 +83,7 @@ export function LoginPage() {
         </Button>
       </form>
       <p className="mt-5 text-center text-sm text-slate-600">
-        New to Amezon?{" "}
+        New to Little Cart?{" "}
         <Link to="/register" className="font-medium text-accent hover:underline">
           Create an account
         </Link>
@@ -129,7 +126,7 @@ export function RegisterPage() {
   }
 
   return (
-    <AuthCard title="Create account" subtitle="Shop millions of (synthetic) products">
+    <AuthCard title="Create account" subtitle="Create an account to save your cart and try a test order.">
       <form onSubmit={onSubmit} className="space-y-4">
         <Input
           label="Full name"
@@ -173,7 +170,7 @@ export function RegisterPage() {
           </div>
         )}
         <Button type="submit" loading={busy} className="w-full" size="lg">
-          Create your Amezon account
+          Create your Little Cart account
         </Button>
       </form>
       <p className="mt-5 text-center text-sm text-slate-600">

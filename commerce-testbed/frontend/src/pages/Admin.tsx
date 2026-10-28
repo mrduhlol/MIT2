@@ -83,7 +83,7 @@ export function AdminPage() {
   return (
     <section className="py-6 md:py-10">
       <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
-        <div><h1 className="text-3xl font-bold text-navy">Admin portal</h1><p className="mt-2 text-sm text-slate-600">Manage Amezon accounts, commerce, and security activity.</p></div>
+        <div><h1 className="text-3xl font-bold text-navy">Admin portal</h1><p className="mt-2 text-sm text-slate-600">Manage Little Cart accounts, commerce, and security activity.</p></div>
         <Button variant="outline" disabled={loading || busy} onClick={() => setRefresh((value) => value + 1)}>Refresh dashboard</Button>
       </div>
       <nav aria-label="Admin dashboards" className="mb-6 flex gap-1 overflow-x-auto border-b border-gray-200 pb-2">

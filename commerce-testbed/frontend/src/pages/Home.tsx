@@ -51,9 +51,9 @@ export function ProductCard({ product }: { product: Product }) {
   return (
     <Link
       to={`/product/${product.id}`}
-      className="group flex flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+      className="group flex flex-col overflow-hidden rounded-xl border border-gray-200 bg-white transition-colors hover:border-teal-500"
     >
-      <div className="relative flex aspect-square items-center justify-center overflow-hidden bg-gray-50 p-4">
+      <div className="relative flex aspect-[5/4] items-center justify-center overflow-hidden bg-gray-50 p-4">
         <ProductImage
           src={product.image_url}
           alt={product.name}
@@ -101,10 +101,8 @@ export function HomePage() {
   const [data, setData] = useState<Paginated<Product> | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [searchBox, setSearchBox] = useState(q);
   const [reload, setReload] = useState(0);
 
-  useEffect(() => setSearchBox(q), [q]);
 
   useEffect(() => {
     let active = true;
@@ -153,46 +151,22 @@ export function HomePage() {
     setParams(sp);
   }
 
-  function onSearch(e: React.FormEvent) {
-    e.preventDefault();
-    update({ q: searchBox.trim(), page: 1 });
-  }
-
   return (
     <div>
-      {/* search + chips row */}
-      <form onSubmit={onSearch} className="mb-3 flex gap-2">
-        <input
-          value={searchBox}
-          onChange={(e) => setSearchBox(e.target.value)}
-          placeholder='Search, e.g. "headphones"…'
-          aria-label="Search products"
-          className="w-full max-w-md rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm shadow-sm focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30"
-        />
-        <Button type="submit" variant="secondary">
-          Search
-        </Button>
-        {(q || category) && (
-          <Button
-            type="button"
-            variant="ghost"
-            onClick={() => {
-              setSearchBox("");
-              setParams(new URLSearchParams());
-            }}
-          >
-            Clear filters ✕
-          </Button>
-        )}
-      </form>
-
+      <section className="mb-8 flex flex-col justify-between gap-4 border-b border-gray-200 pb-7 sm:flex-row sm:items-end">
+        <div><p className="mb-2 text-sm font-medium text-accent">Your everyday shop</p>
+          <h1 className="text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">Find a little something.</h1>
+          <p className="mt-3 max-w-xl text-sm leading-relaxed text-slate-500">Explore essentials for home, work, and everything in between.</p>
+        </div>
+        {(q || category) && <Button variant="outline" onClick={() => setParams(new URLSearchParams())}>Clear filters</Button>}
+      </section>
       <div className="mb-5 flex flex-wrap gap-2">
         <button
           onClick={() => update({ category: "", page: 1 })}
           className={cn(
             "rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors",
             !category
-              ? "border-accent bg-amber-50 text-accent"
+              ? "border-accent bg-teal-50 text-accent"
               : "border-gray-300 bg-white text-slate-600 hover:border-slate-400",
           )}
         >
@@ -205,7 +179,7 @@ export function HomePage() {
             className={cn(
               "rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors",
               category === c
-                ? "border-accent bg-amber-50 text-accent"
+                ? "border-accent bg-teal-50 text-accent"
                 : "border-gray-300 bg-white text-slate-600 hover:border-slate-400",
             )}
           >

@@ -14,7 +14,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 const buttonStyles: Record<ButtonVariant, string> = {
   primary:
     "bg-accent hover:bg-accent-dark text-white shadow-sm focus-visible:ring-accent/50",
-  cta: "bg-cta hover:bg-cta-dark text-navy border border-[#e7c007] shadow-sm focus-visible:ring-cta/60",
+  cta: "bg-cta hover:bg-cta-dark text-white focus-visible:ring-cta/60",
   secondary:
     "bg-navy-light hover:bg-navy text-white shadow-sm focus-visible:ring-navy/50",
   danger:
@@ -118,7 +118,7 @@ export function Card({ children, className }: CardProps) {
   return (
     <div
       className={cn(
-        "rounded-xl border border-gray-200 bg-white p-5 shadow-sm",
+        "rounded-xl border border-gray-200 bg-white p-5",
         className,
       )}
     >
