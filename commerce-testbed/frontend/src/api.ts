@@ -80,43 +80,50 @@ export async function api<T>(path: string, options: ApiOptions = {}): Promise<T>
     if (token) headers["Authorization"] = `Bearer ${token}`;
   }
 
-  let res: Response;
-  try {
-    res = await fetch(`${API_BASE_URL}${path}`, {
-      method,
-      headers,
-      body: body !== undefined ? JSON.stringify(body) : undefined,
-    });
-  } catch {
-    throw new ApiError(0, "Network error — is the API server running?");
-  }
-
-  if (res.status === 401 && auth) {
-    if (getToken()) handle401();
-    throw new ApiError(401, "Not authenticated");
-  }
-  if (res.status === 204) {
-    return undefined as T;
-  }
-  let data: unknown = null;
-  try {
-    data = await res.json();
-    if (
-      data &&
-      typeof data === "object" &&
-      "detail" in (data as Record<string, unknown>) &&
-      !res.ok
-    ) {
-      const wrapped = (data as Record<string, unknown>).detail;
-      if (typeof wrapped === "string") {
-        data = { detail: wrapped };
+  // Reads can recover from a transient edge failure without repeating writes.
+  const attempts = method.toUpperCase() === "GET" ? 3 : 1;
+  for (let attempt = 0; attempt < attempts; attempt++) {
+    try {
+      const res = await fetch(`${API_BASE_URL}${path}`, {
+        method,
+        headers,
+        body: body !== undefined ? JSON.stringify(body) : undefined,
+      });
+      if (res.status === 401 && auth) {
+        if (getToken()) handle401();
+        throw new ApiError(401, "Not authenticated");
       }
+      if (res.status === 204) return undefined as T;
+
+      let data: unknown;
+      try {
+        data = await res.json();
+      } catch {
+        throw new ApiError(
+          res.ok ? 502 : res.status,
+          "The service is temporarily unavailable. Please try again.",
+        );
+      }
+      if (!res.ok) {
+        throw new ApiError(
+          res.status,
+          data && typeof data === "object" && "detail" in data
+            ? data.detail
+            : "The service is temporarily unavailable. Please try again.",
+        );
+      }
+      if (data === null) {
+        throw new ApiError(502, "The service returned an incomplete response. Please try again.");
+      }
+      return data as T;
+    } catch (error) {
+      const failure = error instanceof ApiError
+        ? error
+        : new ApiError(0, "Unable to connect. Check your connection and try again.");
+      const retryable = failure.status === 0 || failure.status === 408 || failure.status === 429 || failure.status >= 500;
+      if (!retryable || attempt === attempts - 1) throw failure;
+      await new Promise((resolve) => setTimeout(resolve, 500 * 2 ** attempt));
     }
-  } catch {
-    // no body
   }
-  if (!res.ok) {
-    throw new ApiError(res.status, data ?? res.statusText);
-  }
-  return data as T;
+  throw new ApiError(503, "The service is temporarily unavailable. Please try again.");
 }

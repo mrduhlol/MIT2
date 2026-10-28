@@ -102,16 +102,12 @@ export function HomePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchBox, setSearchBox] = useState(q);
+  const [reload, setReload] = useState(0);
 
   useEffect(() => setSearchBox(q), [q]);
 
   useEffect(() => {
-    api<string[]>("/api/products/categories")
-      .then(setCategories)
-      .catch(() => setCategories([]));
-  }, []);
-
-  useEffect(() => {
+    let active = true;
     setLoading(true);
     setError(null);
     const sp = new URLSearchParams();
@@ -120,10 +116,21 @@ export function HomePage() {
     sp.set("page", String(page));
     sp.set("page_size", String(PAGE_SIZE));
     api<Paginated<Product>>(`/api/products?${sp.toString()}`)
-      .then(setData)
-      .catch((e) => setError(e?.message ?? "Failed to load products"))
-      .finally(() => setLoading(false));
-  }, [q, category, page]);
+      .then((result) => {
+        if (!result || !Array.isArray(result.items) || !Number.isFinite(result.total)) {
+          throw new Error("The catalog could not be loaded. Please try again.");
+        }
+        if (!active) return;
+        setData(result);
+        // Load optional filters after products, keeping the initial request sequential.
+        void api<string[]>("/api/products/categories")
+          .then((values) => { if (active && Array.isArray(values)) setCategories(values); })
+          .catch(() => {});
+      })
+      .catch((e) => { if (active) setError(e?.message ?? "Failed to load products"); })
+      .finally(() => { if (active) setLoading(false); });
+    return () => { active = false; };
+  }, [q, category, page, reload]);
 
   const totalPages = useMemo(
     () => (data ? Math.max(1, Math.ceil(data.total / data.page_size)) : 1),
@@ -210,7 +217,10 @@ export function HomePage() {
       {loading ? (
         <LoadingScreen message="Loading products…" />
       ) : error ? (
-        <ErrorBox message={error} />
+        <div role="alert" className="space-y-4">
+          <ErrorBox message={error} />
+          <Button onClick={() => setReload((value) => value + 1)}>Retry loading products</Button>
+        </div>
       ) : !data || data.items.length === 0 ? (
         <EmptyState
           icon="🔍"
