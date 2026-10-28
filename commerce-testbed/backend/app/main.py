@@ -44,11 +44,16 @@ app.add_middleware(RequestIDMiddleware)
 
 
 if is_worker_mode():
-    from starlette.middleware.base import BaseHTTPMiddleware
+    from starlette.types import ASGIApp, Receive, Scope, Send
 
-    class WorkerBindingsMiddleware(BaseHTTPMiddleware):
-        async def dispatch(self, request, call_next):
-            env = request.scope["env"]
+    class WorkerBindingsMiddleware:
+        def __init__(self, app: ASGIApp):
+            self.app = app
+
+        async def __call__(self, scope: Scope, receive: Receive, send: Send):
+            if scope["type"] != "http":
+                return await self.app(scope, receive, send)
+            env = scope["env"]
             settings_token = set_request_settings(
                 Settings(
                     SECRET_KEY=env.SECRET_KEY,
@@ -60,7 +65,7 @@ if is_worker_mode():
             database_token = bind_hyperdrive(env.HYPERDRIVE)
             try:
                 ensure_db_initialized()
-                return await call_next(request)
+                await self.app(scope, receive, send)
             finally:
                 reset_hyperdrive(database_token)
                 reset_request_settings(settings_token)

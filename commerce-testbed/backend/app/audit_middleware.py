@@ -2,22 +2,31 @@ import uuid
 
 from fastapi import HTTPException, Request
 from fastapi.responses import JSONResponse
-from starlette.middleware.base import BaseHTTPMiddleware
-from starlette.types import ASGIApp
+from starlette.datastructures import MutableHeaders
+from starlette.types import ASGIApp, Message, Receive, Scope, Send
 
 from .audit import log_event
 from .database import SessionLocal
 
 
-class RequestIDMiddleware(BaseHTTPMiddleware):
-    """Assigns a unique request_id to every request (available in request.state
-    and echoed back in the X-Request-ID response header)."""
+class RequestIDMiddleware:
+    """Attach request IDs without creating background ASGI tasks."""
 
-    async def dispatch(self, request: Request, call_next):
-        request.state.request_id = uuid.uuid4().hex
-        response = await call_next(request)
-        response.headers["X-Request-ID"] = request.state.request_id
-        return response
+    def __init__(self, app: ASGIApp):
+        self.app = app
+
+    async def __call__(self, scope: Scope, receive: Receive, send: Send):
+        if scope["type"] != "http":
+            return await self.app(scope, receive, send)
+        request_id = uuid.uuid4().hex
+        scope.setdefault("state", {})["request_id"] = request_id
+
+        async def send_with_request_id(message: Message):
+            if message["type"] == "http.response.start":
+                MutableHeaders(scope=message)["X-Request-ID"] = request_id
+            await send(message)
+
+        await self.app(scope, receive, send_with_request_id)
 
 
 def log_access_denied(request: Request) -> None:
