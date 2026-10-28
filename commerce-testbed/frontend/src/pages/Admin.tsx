@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { api, formatPrice } from "../api";
 import { useAuth } from "../context/AuthContext";
 import { Button, ErrorBox, LoadingScreen } from "../components/ui";
+import { DeveloperPage } from "./Developer";
 
 const sections = [
   ["overview", "Overview"], ["users", "Users"], ["products", "Products"],
@@ -33,6 +34,7 @@ export function AdminPage() {
   const [overview, setOverview] = useState<Overview | null>(null);
   const [records, setRecords] = useState<Records | null>(null);
   const [offset, setOffset] = useState(0);
+  const [showAllKeys, setShowAllKeys] = useState(false);
   const [query, setQuery] = useState("");
   const [search, setSearch] = useState("");
   const [refresh, setRefresh] = useState(0);
@@ -43,6 +45,7 @@ export function AdminPage() {
 
   useEffect(() => {
     if (user && !allowed) { setLoading(false); return; }
+    if (section === "api-keys" && !showAllKeys) { setLoading(false); setError(null); return; }
     let active = true;
     setLoading(true); setError(null);
     const path = section === "overview" ? "/api/admin/overview"
@@ -54,7 +57,7 @@ export function AdminPage() {
     }).catch((e) => { if (active) setError(e.message || "Unable to load this dashboard."); })
       .finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
-  }, [section, offset, search, refresh, allowed, user]);
+  }, [section, offset, search, refresh, allowed, user, showAllKeys]);
 
   function selectSection(value: Section) {
     setSection(value); setOffset(0); setQuery(""); setSearch(""); setRecords(null);
@@ -84,7 +87,15 @@ export function AdminPage() {
           className={`shrink-0 rounded-lg px-4 py-2 text-sm font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent ${section === key ? "bg-navy text-white" : "text-slate-700 hover:bg-gray-100"}`}>{title}</button>)}
       </nav>
       {error && <div className="mb-5"><ErrorBox message={error} /><Button variant="outline" className="mt-3" onClick={() => setRefresh((value) => value + 1)}>Retry dashboard</Button></div>}
-      {loading ? <LoadingScreen message="Loading dashboard…" /> : section === "overview" && overview ? <>
+      {section === "api-keys" && <div className="mb-8 space-y-6">
+        <DeveloperPage onKeysChanged={() => setRefresh((value) => value + 1)} />
+        <div className="border-t border-gray-200 pt-6">
+          <h2 className="mb-2 text-lg font-bold text-navy">All account API keys</h2>
+          <p className="mb-3 text-sm text-slate-600">Review key metadata and revoke access across all accounts. Secret values are never included.</p>
+          <Button variant="outline" onClick={() => setShowAllKeys((value) => !value)}>{showAllKeys ? "Hide all account keys" : "View all account keys"}</Button>
+        </div>
+      </div>}
+      {section === "api-keys" && !showAllKeys ? null : loading ? <LoadingScreen message="Loading dashboard…" /> : section === "overview" && overview ? <>
         <dl className="grid grid-cols-2 gap-x-8 gap-y-6 border-b border-gray-200 pb-8 md:grid-cols-3">
           {Object.entries(labels).map(([key, title]) => <div key={key}><dt className="text-sm font-medium text-slate-600">{title}</dt><dd className="mt-2 text-3xl font-bold tabular-nums text-navy">{key.endsWith("_cents") ? formatPrice(Number(overview[key])) : Number(overview[key]).toLocaleString()}</dd></div>)}
         </dl>

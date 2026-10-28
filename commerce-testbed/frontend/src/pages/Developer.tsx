@@ -102,7 +102,7 @@ function MetaRow({ label, value }: { label: string; value: string }) {
 
 /* --------------------------------- The page -------------------------------- */
 
-export function DeveloperPage() {
+export function DeveloperPage({ onKeysChanged }: { onKeysChanged?: () => void } = {}) {
   const [keys, setKeys] = useState<ApiKey[] | null>(null);
   const [error, setError] = useState<string | null>(null); // load error
   const [actionError, setActionError] = useState<string | null>(null); // rotate/revoke error
@@ -156,6 +156,7 @@ export function DeveloperPage() {
     try {
       const res = await api<ApiKeySecret>(`/api/api-keys/${k.id}/rotate`, { method: "POST" });
       load();
+      onKeysChanged?.();
       showNotice(`Key "${k.name}" rotated.`);
       setCopied(false);
       setSecretMode("rotated");
@@ -187,6 +188,7 @@ export function DeveloperPage() {
             )
           : list,
       );
+      onKeysChanged?.();
       showNotice(`Key "${k.name}" revoked — integrations using it lost access immediately.`);
     } catch (err) {
       setActionError(err instanceof Error ? err.message : "Failed to revoke key");
@@ -237,6 +239,7 @@ export function DeveloperPage() {
       setExpiresAt("");
       setEnvironment("development");
       load();
+      onKeysChanged?.();
       showNotice(`API key "${res.key.name}" created.`);
       setCopied(false);
       setSecretMode("created");
