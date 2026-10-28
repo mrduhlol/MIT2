@@ -27,11 +27,25 @@ class User(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
 
+    admin_role = relationship("AdminRole", uselist=False, cascade="all, delete-orphan")
+
+    @property
+    def is_admin(self) -> bool:
+        return self.admin_role is not None
+
     addresses = relationship("Address", back_populates="user", cascade="all, delete-orphan")
     sessions = relationship("SessionRecord", back_populates="user", cascade="all, delete-orphan")
     cart_items = relationship("CartItem", back_populates="user", cascade="all, delete-orphan")
     orders = relationship("Order", back_populates="user")
     api_keys = relationship("ApiKey", back_populates="user", cascade="all, delete-orphan")
+
+
+class AdminRole(Base):
+    """Explicit server-managed grants; registration cannot create these."""
+    __tablename__ = "admin_roles"
+
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), primary_key=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
 
 
 class Address(Base):

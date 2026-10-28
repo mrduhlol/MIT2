@@ -137,3 +137,24 @@ Scopes: `security_events:read`, `security_events:write`, `incidents:read`, `user
 returns pseudonymous-only metadata — no PII). Rotation revokes the old key immediately; expired and
 revoked keys get distinct 401 responses; per-key rate limits (120 reads/min, 30 writes/min) return
 429 with `Retry-After`. Full endpoint docs: `commerce-testbed/backend/README.md` and `/docs`.
+
+## Administrator portal
+
+Administrators sign in through `/login` and are sent to `/admin`. The portal includes live
+overview, users, products, orders, sessions, API keys, and security-event dashboards, with
+search, pagination, account enable/disable, and session/key revocation. Privileges are checked
+against the `admin_roles` table on every admin API request. Registration and profile updates
+cannot grant admin access. Responses exclude password hashes, session identifiers, and secret
+API-key material. Admin views and actions are audit-logged.
+
+Provision or reset an administrator explicitly (the password is prompted privately):
+
+```bash
+cd commerce-testbed/backend
+.venv/bin/python -m scripts.create_admin --email owner@example.com
+.venv/bin/python -m scripts.check_admin --base-url http://127.0.0.1:8001 --email owner@example.com
+```
+
+The setup command creates the additive admin-role table, stores only a bcrypt password hash,
+and revokes existing sessions when resetting an account. There are no built-in admin passwords
+or email-based privilege bypasses. Credentials are not stored in repository files.

@@ -225,6 +225,7 @@ export function Header() {
                     <p className="truncate text-xs text-slate-500">{user.email}</p>
                   </div>
                   {[
+                    ...(user.is_admin ? [{ to: "/admin", label: "Admin portal" }] : []),
                     { to: "/account", label: "Your Account" },
                     { to: "/orders", label: "Your Orders" },
                     { to: "/cart", label: "Your Cart" },

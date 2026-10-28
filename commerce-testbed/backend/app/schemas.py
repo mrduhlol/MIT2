@@ -34,6 +34,7 @@ class UserOut(BaseModel):
     pseudo_id: str
     created_at: datetime
     is_active: bool
+    is_admin: bool = False
 
 
 class TokenResponse(BaseModel):

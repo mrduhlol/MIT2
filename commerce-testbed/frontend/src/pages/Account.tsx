@@ -27,7 +27,7 @@ export function ProfilePage() {
   useEffect(() => {
     (async () => {
       try {
-        const me = await api<{ id: string; email: string; full_name: string; phone?: string }>(
+        const me = await api<{ id: string; email: string; full_name: string; phone?: string; is_admin: boolean }>(
           "/api/me",
         );
         setFullName(me.full_name ?? "");
@@ -52,7 +52,7 @@ export function ProfilePage() {
     setError(null);
     setSaved(false);
     try {
-      const updated = await api<{ id: string; email: string; full_name: string; phone?: string }>(
+      const updated = await api<{ id: string; email: string; full_name: string; phone?: string; is_admin: boolean }>(
         "/api/me",
         { method: "PUT", body: { full_name: fullName, phone } },
       );

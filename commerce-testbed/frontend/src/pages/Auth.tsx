@@ -46,8 +46,8 @@ export function LoginPage() {
     setError(null);
     setBusy(true);
     try {
-      await login(email.trim(), password);
-      navigate(next, { replace: true });
+      const user = await login(email.trim(), password);
+      navigate(user.is_admin ? "/admin" : next, { replace: true });
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Login failed. Please try again.");
     } finally {

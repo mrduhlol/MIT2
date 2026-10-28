@@ -17,7 +17,7 @@ from .database import (
     is_worker_mode,
     reset_hyperdrive,
 )
-from .routers import auth, cart, events, orders, products, users
+from .routers import admin, auth, cart, events, orders, products, users
 from .routers import api_keys as api_keys_router
 from .routers import security as security_router
 
@@ -88,6 +88,7 @@ exception_handlers = app.exception_handlers
 exception_handlers[StarletteHTTPException] = access_denied_exception_handler
 exception_handlers[RateLimitExceeded] = rate_limit_exception_handler
 
+app.include_router(admin.router, prefix="/api/admin", tags=["admin"])
 app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
 app.include_router(users.router, prefix="/api", tags=["users"])
 app.include_router(products.router, prefix="/api/products", tags=["products"])

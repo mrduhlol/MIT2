@@ -12,6 +12,7 @@ import {
   SessionsPage,
   SettingsPage,
 } from "./pages/Account";
+import { AdminPage } from "./pages/Admin";
 import { DeveloperPage } from "./pages/Developer";
 import { Button, EmptyState } from "./components/ui";
 
@@ -40,6 +41,7 @@ export default function App() {
             <Route path="/product/:id" element={<ProductPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
+            <Route path="/admin" element={<RequireAuth><AdminPage /></RequireAuth>} />
 
             <Route
               path="/cart"
