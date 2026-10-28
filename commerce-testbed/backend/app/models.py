@@ -1,4 +1,5 @@
 import uuid
+import hmac
 from datetime import datetime, timezone
 
 from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String, Text, UniqueConstraint
@@ -27,17 +28,35 @@ class User(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
 
+    demo_account = relationship("DemoAccount", uselist=False, cascade="all, delete-orphan")
     admin_role = relationship("AdminRole", uselist=False, cascade="all, delete-orphan")
 
     @property
     def is_admin(self) -> bool:
         return self.admin_role is not None
 
+    @property
+    def demo_password(self) -> str | None:
+        from .demo_data import DEMO_PASSWORD
+        if self.demo_account is None or self.is_admin:
+            return None
+        if not hmac.compare_digest(self.hashed_password, self.demo_account.expected_hash):
+            return None
+        return DEMO_PASSWORD
+
     addresses = relationship("Address", back_populates="user", cascade="all, delete-orphan")
     sessions = relationship("SessionRecord", back_populates="user", cascade="all, delete-orphan")
     cart_items = relationship("CartItem", back_populates="user", cascade="all, delete-orphan")
     orders = relationship("Order", back_populates="user")
     api_keys = relationship("ApiKey", back_populates="user", cascade="all, delete-orphan")
+
+
+class DemoAccount(Base):
+    """Marks explicitly provisioned synthetic accounts with public sample credentials."""
+    __tablename__ = "demo_accounts"
+
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), primary_key=True)
+    expected_hash: Mapped[str] = mapped_column(String(255))
 
 
 class AdminRole(Base):

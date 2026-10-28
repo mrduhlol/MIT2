@@ -21,7 +21,7 @@ router = APIRouter(dependencies=[Depends(require_admin)])
 
 # Explicit response allowlists prevent accidental disclosure when models change.
 RESOURCES = {
-    "users": (User, ("id", "email", "full_name", "is_active", "is_admin", "created_at")),
+    "users": (User, ("id", "email", "full_name", "is_active", "is_admin", "demo_password", "created_at")),
     "products": (Product, ("id", "name", "category", "price_cents", "stock")),
     "orders": (Order, ("id", "user_id", "status", "total_cents", "created_at")),
     "sessions": (SessionRecord, ("id", "user_id", "created_at", "expires_at", "revoked_at")),
@@ -55,7 +55,7 @@ def records(resource: str, request: Request, limit: int = Query(50, ge=1, le=100
     model, columns = RESOURCES[resource]
     query = db.query(model)
     if model is User:
-        query = query.options(selectinload(User.admin_role))
+        query = query.options(selectinload(User.admin_role), selectinload(User.demo_account))
     if q:
         searchable = [getattr(model, name) for name in ("email", "full_name", "name", "status", "event_type", "source", "severity", "pseudo_user") if hasattr(model, name)]
         searchable.extend(cast(getattr(model, name), String) for name in ("id", "user_id") if hasattr(model, name))

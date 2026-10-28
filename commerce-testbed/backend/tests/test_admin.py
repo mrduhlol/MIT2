@@ -62,3 +62,27 @@ def test_admin_controls_revoke_access_and_are_audited(client, db):
     events=db.query(SecurityEvent).filter(SecurityEvent.pseudo_user==admin['user']['pseudo_id']).all()
     assert {'admin_user_status_changed','admin_api_key_revoked','admin_session_revoked'} <= {event.event_type for event in events}
     assert admin['password'] not in json.dumps([event.details for event in events])
+
+
+def test_only_explicit_demo_credentials_are_displayed(client, db):
+    from app.demo_data import DEMO_PASSWORD
+    from app.models import DemoAccount
+    from app.security import hash_password
+    admin, headers = grant_admin(client, db)
+    demo = registered_user(client, password=DEMO_PASSWORD)
+    normal = registered_user(client)
+    from app.models import User
+    user = db.get(User, demo['user']['id'])
+    db.add(DemoAccount(user_id=user.id, expected_hash=user.hashed_password))
+    db.commit()
+    rows = client.get('/api/admin/records/users?limit=100', headers=headers).json()['items']
+    indexed = {row['id']: row for row in rows}
+    assert indexed[user.id]['demo_password'] == DEMO_PASSWORD
+    assert indexed[normal['user']['id']]['demo_password'] is None
+    assert indexed[admin['user']['id']]['demo_password'] is None
+    # Public profile responses never include the demo password.
+    assert 'demo_password' not in client.get('/api/me', headers=auth_headers(demo['token'])).json()
+    user.hashed_password = hash_password('ChangedDemoPassword2026!')
+    db.commit()
+    rows = client.get('/api/admin/records/users?limit=100', headers=headers).json()['items']
+    assert next(row for row in rows if row['id']==user.id)['demo_password'] is None

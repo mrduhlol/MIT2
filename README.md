@@ -188,3 +188,15 @@ All storefront, cart, checkout, order-history, and admin amounts display in Indi
 (INR / ₹) with Indian digit grouping. Monetary database/API fields keep their legacy
 `*_cents` names for compatibility; their integer values represent paise (100 paise = ₹1).
 Existing numeric prices and order amounts are retained; this is not an exchange-rate conversion.
+
+## Public synthetic credentials for hackathon demos
+
+Admin → Users includes a **Demo password** column only for explicitly provisioned synthetic
+shopper accounts. Run `python -m scripts.create_demo_accounts` from the backend directory to
+create three `demo-shopper-N@example.com` accounts with the intentionally public sample
+password in `app/demo_data.py`. These are marked Synthetic and their provisioning events
+are tagged `source: synthetic`. Existing accounts are never reset or reclassified.
+
+Normal registration/password-change flows store only bcrypt hashes and do not capture
+plaintext passwords. Public profile responses exclude demo credentials. If a demo account's
+password changes or it becomes an administrator, its demo password is no longer displayed.
