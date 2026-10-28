@@ -350,6 +350,7 @@ export function Layout({ children }: { children: ReactNode }) {
               <h3 className="mb-2 text-sm font-bold text-white">Your Amezon</h3>
               <ul className="space-y-1.5">
                 <li><Link to="/account" className="hover:underline">Your Account</Link></li>
+                <li><a href="/images/products/credits.html" className="hover:underline">Product image credits</a></li>
                 <li><Link to="/orders" className="hover:underline">Your Orders</Link></li>
                 <li><Link to="/account/addresses" className="hover:underline">Saved Addresses</Link></li>
                 <li><Link to="/cart" className="hover:underline">Your Cart</Link></li>

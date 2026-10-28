@@ -236,6 +236,7 @@ export function ProductImage({
   className?: string;
 }) {
   const [failed, setFailed] = useState(false);
+  useEffect(() => setFailed(false), [src]);
   const effective = failed || !src ? PLACEHOLDER : src;
   return (
     <img

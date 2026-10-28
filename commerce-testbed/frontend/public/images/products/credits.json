@@ -1,0 +1,356 @@
+{
+  "1": {
+    "product": "Wireless Noise-Cancelling Headphones",
+    "path": "/images/products/product-01.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:S%C5%82uchawki_referencyjne_K-701_firmy_AKG.jpg",
+    "author": "http://muzyczny.pl",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+    "file": "File:Słuchawki referencyjne K-701 firmy AKG.jpg"
+  },
+  "2": {
+    "product": "Portable Bluetooth Speaker",
+    "path": "/images/products/product-02.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:JBL_Flip_3_bluetooth_speaker_(DSCF2653).jpg",
+    "author": "Trougnouf",
+    "license": "CC BY 4.0",
+    "license_url": "https://creativecommons.org/licenses/by/4.0",
+    "file": "File:JBL Flip 3 bluetooth speaker (DSCF2653).jpg"
+  },
+  "3": {
+    "product": "4K Action Camera",
+    "path": "/images/products/product-03.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:GoPro_Hero_4_Black.jpg",
+    "author": "Resolution hire",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+    "file": "File:GoPro Hero 4 Black.jpg"
+  },
+  "4": {
+    "product": "Smartphone Power Bank 20000mAh",
+    "path": "/images/products/product-04.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:2023_Powerbank_Green_Cell_PowerPlay_20_(4).jpg",
+    "author": "Jacek Halicki",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+    "file": "File:2023 Powerbank Green Cell PowerPlay 20 (4).jpg"
+  },
+  "5": {
+    "product": "Mechanical Gaming Keyboard",
+    "path": "/images/products/product-05.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Mechanical_keyboard_example.jpg",
+    "author": "Thanasis Termitzoglou",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+    "file": "File:Mechanical keyboard example.jpg"
+  },
+  "6": {
+    "product": "27-Inch IPS Monitor",
+    "path": "/images/products/product-06.png",
+    "source": "https://commons.wikimedia.org/wiki/File:EIZO_Foris_FG2421_VGA_computer_monitor_displaying_test_pattern.png",
+    "author": "Lucasbosch",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+    "file": "File:EIZO Foris FG2421 VGA computer monitor displaying test pattern.png"
+  },
+  "7": {
+    "product": "Smart Doorbell Camera",
+    "path": "/images/products/product-07.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Ring_video_doorbell.jpg",
+    "author": "Ring",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+    "file": "File:Ring video doorbell.jpg"
+  },
+  "8": {
+    "product": "Noise-Isolating Earbuds",
+    "path": "/images/products/product-08.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Yamaha_TW-E3A_Earbuds_Customize,_Japan;_April_2021_(01).jpg",
+    "author": "MIKI Yoshihito. (#mikiyoshihito)",
+    "license": "CC BY 2.0",
+    "license_url": "https://creativecommons.org/licenses/by/2.0",
+    "file": "File:Yamaha TW-E3A Earbuds Customize, Japan; April 2021 (01).jpg"
+  },
+  "9": {
+    "product": "Stainless Steel Air Fryer 5L",
+    "path": "/images/products/product-09.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Airfryer.jpg",
+    "author": "Djsgmnd",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+    "file": "File:Airfryer.jpg"
+  },
+  "10": {
+    "product": "Ceramic Nonstick Skillet",
+    "path": "/images/products/product-10.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Diamond_surface_nonstick_frying_pan.jpg",
+    "author": "Diamond diamond diamond",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+    "file": "File:Diamond surface nonstick frying pan.jpg"
+  },
+  "11": {
+    "product": "Espresso Machine with Milk Frother",
+    "path": "/images/products/product-11.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Rocket_silver_metal_espresso_machine_on_table.jpg",
+    "author": "HungryHuy",
+    "license": "CC BY 2.0",
+    "license_url": "https://creativecommons.org/licenses/by/2.0",
+    "file": "File:Rocket silver metal espresso machine on table.jpg"
+  },
+  "12": {
+    "product": "Bamboo Cutting Board Set",
+    "path": "/images/products/product-12.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Chopping_Board.jpg",
+    "author": "Donovan Govan.",
+    "license": "CC BY-SA 3.0",
+    "license_url": "http://creativecommons.org/licenses/by-sa/3.0/",
+    "file": "File:Chopping Board.jpg"
+  },
+  "13": {
+    "product": "Robot Vacuum Cleaner",
+    "path": "/images/products/product-13.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Reinigungsroboter_tcm_100.JPG",
+    "author": "Stephan M. Höhne.\n\nOriginal uploader was Stephanhoehne at German Wikipedia",
+    "license": "CC BY-SA 2.0 de",
+    "license_url": "https://creativecommons.org/licenses/by-sa/2.0/de/deed.en",
+    "file": "File:Reinigungsroboter tcm 100.JPG"
+  },
+  "14": {
+    "product": "Cotton Bath Towel 6-Pack",
+    "path": "/images/products/product-14.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Zusammengelegte_Handt%C3%BCcher.jpg",
+    "author": "User:Mattes",
+    "license": "Public domain",
+    "license_url": "https://commons.wikimedia.org/wiki/File:Zusammengelegte_Handt%C3%BCcher.jpg",
+    "file": "File:Zusammengelegte Handtücher.jpg"
+  },
+  "15": {
+    "product": "LED Desk Lamp with USB Port",
+    "path": "/images/products/product-15.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Anglepoise1227.jpg",
+    "author": "CATMANUM",
+    "license": "Public domain",
+    "license_url": "https://commons.wikimedia.org/wiki/File:Anglepoise1227.jpg",
+    "file": "File:Anglepoise1227.jpg"
+  },
+  "16": {
+    "product": "Cast Iron Dutch Oven",
+    "path": "/images/products/product-16.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Druware_Dutch_Oven.jpg",
+    "author": "Kerri9494",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+    "file": "File:Druware Dutch Oven.jpg"
+  },
+  "17": {
+    "product": "The Silent Horizon (Hardcover Sci-Fi Novel)",
+    "path": "/images/products/product-17.svg",
+    "author": "Amezon demo project",
+    "license": "Original demo artwork",
+    "source": "",
+    "license_url": ""
+  },
+  "18": {
+    "product": "Foundations of Machine Learning",
+    "path": "/images/products/product-18.svg",
+    "author": "Amezon demo project",
+    "license": "Original demo artwork",
+    "source": "",
+    "license_url": ""
+  },
+  "19": {
+    "product": "The Art of Mediterranean Cooking",
+    "path": "/images/products/product-19.svg",
+    "author": "Amezon demo project",
+    "license": "Original demo artwork",
+    "source": "",
+    "license_url": ""
+  },
+  "20": {
+    "product": "A History of Cartography",
+    "path": "/images/products/product-20.svg",
+    "author": "Amezon demo project",
+    "license": "Original demo artwork",
+    "source": "",
+    "license_url": ""
+  },
+  "21": {
+    "product": "Garden Design for Small Spaces",
+    "path": "/images/products/product-21.svg",
+    "author": "Amezon demo project",
+    "license": "Original demo artwork",
+    "source": "",
+    "license_url": ""
+  },
+  "22": {
+    "product": "Mystery at Millbrook Manor (Paperback)",
+    "path": "/images/products/product-22.svg",
+    "author": "Amezon demo project",
+    "license": "Original demo artwork",
+    "source": "",
+    "license_url": ""
+  },
+  "23": {
+    "product": "Adjustable Dumbbell Set 55lb",
+    "path": "/images/products/product-23.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:TwoDumbbells.JPG",
+    "author": "Unknown; see source",
+    "license": "CC BY-SA 3.0",
+    "license_url": "http://creativecommons.org/licenses/by-sa/3.0/",
+    "file": "File:TwoDumbbells.JPG"
+  },
+  "24": {
+    "product": "Carbon Fiber Road Helmet",
+    "path": "/images/products/product-24.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Bicycle_Helmet_0085.jpg",
+    "author": "Ashley Pomeroy",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+    "file": "File:Bicycle Helmet 0085.jpg"
+  },
+  "25": {
+    "product": "Professional Yoga Mat 6mm",
+    "path": "/images/products/product-25.png",
+    "source": "https://commons.wikimedia.org/wiki/File:Yoga_mats.png",
+    "author": "Sha89sha",
+    "license": "CC0",
+    "license_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "file": "File:Yoga mats.png"
+  },
+  "26": {
+    "product": "Camping Tent 4-Person",
+    "path": "/images/products/product-26.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Camping_tent_on_tarp.jpg",
+    "author": "Eden Aviv",
+    "license": "CC0",
+    "license_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "file": "File:Camping tent on tarp.jpg"
+  },
+  "27": {
+    "product": "Resistance Band Kit",
+    "path": "/images/products/product-27.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Trenirovachni_lastici_set.JPG",
+    "author": "Velislav Panchev",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+    "file": "File:Trenirovachni lastici set.JPG"
+  },
+  "28": {
+    "product": "Insulated Water Bottle 32oz",
+    "path": "/images/products/product-28.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Stainless_Steel_Water_Bottle.jpg",
+    "author": "Gannu03",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+    "file": "File:Stainless Steel Water Bottle.jpg"
+  },
+  "29": {
+    "product": "Wooden Railway Train Set",
+    "path": "/images/products/product-29.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Holzeisenbahn.jpg",
+    "author": "Christian Lindecke",
+    "license": "CC BY-SA 3.0",
+    "license_url": "http://creativecommons.org/licenses/by-sa/3.0/",
+    "file": "File:Holzeisenbahn.jpg"
+  },
+  "30": {
+    "product": "STEM Robotics Starter Kit",
+    "path": "/images/products/product-30.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Lego_Mindstorms_Sound_Finder.jpg",
+    "author": "baholfor",
+    "license": "CC BY 2.0",
+    "license_url": "https://creativecommons.org/licenses/by/2.0",
+    "file": "File:Lego Mindstorms Sound Finder.jpg"
+  },
+  "31": {
+    "product": "Puzzle 1000 Pieces - Vintage World Map",
+    "path": "/images/products/product-31.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Antique_World_Map_jigsaw_puzzle_(2).jpg",
+    "author": "I would appreciate being notified if you use my work outside Wikimedia.\nDo not copy this image illegally by ignoring the terms of the license below, as it is not in the public domain. If you would like special permission to use, license, or purchase the image please contact me to negotiate terms.\n\nMore of my work can be found in my personal gallery.",
+    "license": "CC BY-SA 3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0",
+    "file": "File:Antique World Map jigsaw puzzle (2).jpg"
+  },
+  "32": {
+    "product": "Plush Cuddle Bear XL",
+    "path": "/images/products/product-32.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Teddy_bear_on_the_window_sill_01.jpg",
+    "author": "Chenspec",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+    "file": "File:Teddy bear on the window sill 01.jpg"
+  },
+  "33": {
+    "product": "Junior Chemistry Lab Set",
+    "path": "/images/products/product-33.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:1940s_Gilbert_chemistry_set_03.jpg",
+    "author": "Joe Mabel",
+    "license": "CC BY-SA 3.0",
+    "license_url": "http://creativecommons.org/licenses/by-sa/3.0/",
+    "file": "File:1940s Gilbert chemistry set 03.jpg"
+  },
+  "34": {
+    "product": "Remote Control Stunt Car",
+    "path": "/images/products/product-34.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Nitro_Buggy_RC_Car.jpg",
+    "author": "Quist",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+    "file": "File:Nitro Buggy RC Car.jpg"
+  },
+  "35": {
+    "product": "Vitamin C Brightening Serum",
+    "path": "/images/products/product-35.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Retinol-2023-03-24.jpg",
+    "author": "Vauia Rex",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+    "file": "File:Retinol-2023-03-24.jpg"
+  },
+  "36": {
+    "product": "Sulfate-Free Shampoo Duo",
+    "path": "/images/products/product-36.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Dove_shampoo_bottle.jpg",
+    "author": "Ranjima np",
+    "license": "CC0",
+    "license_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "file": "File:Dove shampoo bottle.jpg"
+  },
+  "37": {
+    "product": "Exfoliating Clay Mask",
+    "path": "/images/products/product-37.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Facial_mask.jpg",
+    "author": "Sérgio (Savaman) Savarese",
+    "license": "CC BY 2.0",
+    "license_url": "https://creativecommons.org/licenses/by/2.0",
+    "file": "File:Facial mask.jpg"
+  },
+  "38": {
+    "product": "Rosewater Facial Toner",
+    "path": "/images/products/product-38.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:G%C3%BClsuyu.jpg",
+    "author": "E4024",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+    "file": "File:Gülsuyu.jpg"
+  },
+  "39": {
+    "product": "Professional Makeup Brush Set",
+    "path": "/images/products/product-39.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Makeup-brushes.tif",
+    "author": "DamianKrzyzanowski",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+    "file": "File:Makeup-brushes.tif"
+  },
+  "40": {
+    "product": "Beard Grooming Kit",
+    "path": "/images/products/product-40.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Beard_Oil_and_Brush.jpg",
+    "author": "Tools of Men",
+    "license": "CC BY 2.0",
+    "license_url": "https://creativecommons.org/licenses/by/2.0",
+    "file": "File:Beard Oil and Brush.jpg"
+  }
+}

@@ -285,7 +285,7 @@ def test_products_list_categories_detail(client):
 
     single = client.get("/api/products/1")
     assert single.status_code == 200
-    assert "picsum.photos" in single.json()["image_url"]
+    assert single.json()["image_url"].startswith("/images/products/")
     assert client.get("/api/products/999999").status_code == 404
 
     search = client.get("/api/products", params={"q": "headphones", "page_size": 50})
@@ -530,3 +530,21 @@ def test_suspicious_login_activity_after_repeated_failures(client, db):
     # only one suspicious event per email hash should exist for this test run
     hashes = [json.loads(e.details or "{}").get("email_hash") for e in suspicious]
     assert hashes.count(details["email_hash"]) == 1
+
+
+def test_catalog_images_cover_every_seed_and_migrate_legacy_photos(db):
+    from pathlib import Path
+    from app.database import init_db
+    from app.product_images import PRODUCT_IMAGES
+    from app.seed_data import PRODUCTS
+    assert set(PRODUCT_IMAGES) == {product[0] for product in PRODUCTS}
+    public = Path(__file__).resolve().parents[2] / 'frontend' / 'public'
+    assert all((public / path.lstrip('/')).is_file() for path in PRODUCT_IMAGES.values())
+    product = db.query(Product).order_by(Product.id).first()
+    original = (product.id, product.stock, product.price_cents)
+    product.image_url = 'https://picsum.photos/seed/legacy/400/300'
+    db.commit()
+    init_db()
+    db.expire_all()
+    assert product.image_url == PRODUCT_IMAGES[product.name]
+    assert (product.id, product.stock, product.price_cents) == original

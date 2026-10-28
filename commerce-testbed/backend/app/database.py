@@ -2,13 +2,14 @@ import os
 from contextvars import ContextVar, Token
 from typing import Iterator
 
-from sqlalchemy import create_engine, text
+from sqlalchemy import case, create_engine, or_, text, update
 from sqlalchemy.engine import make_url
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.pool import NullPool
 
 from .config import get_settings
 from .models import Base, Product
+from .product_images import PRODUCT_IMAGES
 
 _settings = get_settings()
 
@@ -120,6 +121,11 @@ def _initialize_schema(schema_engine) -> None:
         with Session(bind=connection, expire_on_commit=False) as db:
             if db.query(Product).count() == 0:
                 _seed_products(db)
+        # Backfill legacy random photos atomically without touching prices or stock.
+        connection.execute(update(Product).where(
+            Product.name.in_(PRODUCT_IMAGES),
+            or_(Product.image_url.like("https://picsum.photos/%"), Product.image_url == "", Product.image_url.is_(None)),
+        ).values(image_url=case(PRODUCT_IMAGES, value=Product.name)))
 
 
 def ensure_db_initialized() -> None:
@@ -142,9 +148,7 @@ def _seed_products(db: Session) -> None:
             stock=stock,
         )
         db.add(product)
-        # Flush to obtain the id for a stable image URL.
-        db.flush()
-        product.image_url = f"https://picsum.photos/seed/{product.id}/400/300"
+        product.image_url = PRODUCT_IMAGES[name]
     db.commit()
 
 

@@ -200,3 +200,14 @@ are tagged `source: synthetic`. Existing accounts are never reset or reclassifie
 Normal registration/password-change flows store only bcrypt hashes and do not capture
 plaintext passwords. Public profile responses exclude demo credentials. If a demo account's
 password changes or it becomes an administrator, its demo password is no longer displayed.
+
+## Product imagery
+
+Each of the 40 seeded products has a stable image in
+`commerce-testbed/frontend/public/images/products/`, mapped by product name in
+`backend/app/product_images.py`. Photos illustrate the named product type; the six book
+covers are original title-matched demo artwork. Photographer/license attribution is
+available from the footer's Product image credits link and `credits.json` beside the images.
+Startup atomically replaces legacy Picsum URLs without modifying product IDs, prices, stock,
+or orders. Custom image URLs are preserved. Images are served by the site's static assets,
+so browsers do not depend on third-party photo services.
