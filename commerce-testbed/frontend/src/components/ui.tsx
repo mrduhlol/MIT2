@@ -1,4 +1,4 @@
-import { useState, type ButtonHTMLAttributes, type InputHTMLAttributes, type ReactNode, type SelectHTMLAttributes } from "react";
+import { useEffect, useState, type ButtonHTMLAttributes, type InputHTMLAttributes, type ReactNode, type SelectHTMLAttributes } from "react";
 import { cn } from "../utils";
 
 /* ---------------------------------- Button --------------------------------- */
@@ -128,7 +128,7 @@ export function Card({ children, className }: CardProps) {
 
 /* ---------------------------------- Badge ---------------------------------- */
 
-type BadgeColor = "gray" | "green" | "amber" | "blue" | "red";
+export type BadgeColor = "gray" | "green" | "amber" | "blue" | "red";
 
 interface BadgeProps {
   children: ReactNode;
@@ -266,6 +266,65 @@ export function EmptyState({
       <p className="text-base font-semibold text-slate-700">{title}</p>
       {subtitle && <p className="max-w-sm text-sm text-slate-500">{subtitle}</p>}
       {action && <div className="mt-3">{action}</div>}
+    </div>
+  );
+}
+
+/* ---------------------------------- Modal ---------------------------------- */
+
+interface ModalProps {
+  open: boolean;
+  title: string;
+  onClose: () => void;
+  children: ReactNode;
+  /** Optional footer row (usually cancel/confirm buttons). */
+  footer?: ReactNode;
+  wide?: boolean;
+}
+
+export function Modal({ open, title, onClose, children, footer, wide }: ModalProps) {
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [open, onClose]);
+
+  if (!open) return null;
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      role="dialog"
+      aria-modal="true"
+      aria-label={title}
+    >
+      <div className="absolute inset-0 bg-slate-900/50" onClick={onClose} />
+      <div
+        className={cn(
+          "relative flex max-h-[85vh] w-full flex-col rounded-xl bg-white shadow-xl",
+          wide ? "max-w-2xl" : "max-w-lg",
+        )}
+      >
+        <div className="flex items-center justify-between border-b border-gray-200 px-5 py-4">
+          <h3 className="font-bold text-slate-900">{title}</h3>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close"
+            className="-mr-1 rounded-lg p-1 text-slate-400 hover:bg-gray-100 hover:text-slate-600"
+          >
+            ✕
+          </button>
+        </div>
+        <div className="overflow-y-auto px-5 py-4">{children}</div>
+        {footer && (
+          <div className="flex justify-end gap-3 border-t border-gray-200 px-5 py-4">
+            {footer}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

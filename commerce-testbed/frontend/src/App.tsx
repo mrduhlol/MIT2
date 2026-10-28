@@ -12,6 +12,7 @@ import {
   SessionsPage,
   SettingsPage,
 } from "./pages/Account";
+import { DeveloperPage } from "./pages/Developer";
 import { Button, EmptyState } from "./components/ui";
 
 function NotFound() {
@@ -76,6 +77,7 @@ export default function App() {
               <Route path="addresses" element={<AddressesPage />} />
               <Route path="sessions" element={<SessionsPage />} />
               <Route path="settings" element={<SettingsPage />} />
+              <Route path="developer" element={<DeveloperPage />} />
             </Route>
 
             <Route path="/404" element={<NotFound />} />

@@ -64,6 +64,30 @@ export interface Order {
   [key: string]: unknown;
 }
 
+export type ApiKeyEnvironment = "development" | "production";
+
+export type ApiKeyStatus = "active" | "expired" | "revoked";
+
+export interface ApiKey {
+  id: string;
+  key_id: string;
+  name: string;
+  environment: ApiKeyEnvironment;
+  scopes: string[];
+  visible_prefix: string;
+  status: ApiKeyStatus;
+  created_at: string;
+  expires_at?: string | null;
+  revoked_at?: string | null;
+  last_used_at?: string | null;
+}
+
+export interface ApiKeySecret {
+  key: ApiKey;
+  /** Full plaintext key — returned only on create/rotate, never again. */
+  secret: string;
+}
+
 export interface Paginated<T> {
   items: T[];
   total: number;

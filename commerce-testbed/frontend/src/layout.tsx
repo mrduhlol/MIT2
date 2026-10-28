@@ -266,6 +266,7 @@ export function AccountLayout() {
             <NavTab to="/account/addresses">📍 Addresses</NavTab>
             <NavTab to="/account/sessions">🔐 Sessions</NavTab>
             <NavTab to="/account/settings">⚙️ Settings</NavTab>
+            <NavTab to="/account/developer">🔑 Developer</NavTab>
           </nav>
         </aside>
         <div className="min-w-0 flex-1">
