@@ -3,7 +3,7 @@ import { cn } from "../utils";
 
 /* ---------------------------------- Button --------------------------------- */
 
-type ButtonVariant = "primary" | "secondary" | "danger" | "ghost" | "outline";
+type ButtonVariant = "primary" | "secondary" | "danger" | "ghost" | "outline" | "cta";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;
@@ -14,6 +14,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 const buttonStyles: Record<ButtonVariant, string> = {
   primary:
     "bg-accent hover:bg-accent-dark text-white shadow-sm focus-visible:ring-accent/50",
+  cta: "bg-cta hover:bg-cta-dark text-navy border border-[#e7c007] shadow-sm focus-visible:ring-cta/60",
   secondary:
     "bg-navy-light hover:bg-navy text-white shadow-sm focus-visible:ring-navy/50",
   danger:

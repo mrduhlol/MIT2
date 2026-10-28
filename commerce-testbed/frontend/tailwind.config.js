@@ -6,6 +6,8 @@ export default {
       colors: {
         accent: "#e47911",
         "accent-dark": "#c26a0d",
+        cta: "#FFD814",
+        "cta-dark": "#F7CA00",
         navy: "#131921",
         "navy-light": "#232f3e",
       },

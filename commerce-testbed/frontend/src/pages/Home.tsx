@@ -73,6 +73,7 @@ export function ProductCard({ product }: { product: Product }) {
         <div className="mt-auto pt-2">
           <Button
             size="sm"
+            variant="cta"
             className="w-full"
             loading={busy}
             onClick={onAdd}

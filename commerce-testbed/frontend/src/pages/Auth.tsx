@@ -1,15 +1,18 @@
 import { useState, type FormEvent, type ReactNode } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { AmezonLogo } from "../layout";
 import { ApiError } from "../api";
 import { Button, Input } from "../components/ui";
 
 function AuthCard({ title, subtitle, children }: { title: string; subtitle?: ReactNode; children: ReactNode }) {
   return (
     <div className="mx-auto flex max-w-md flex-col items-center px-4 py-10">
-      <Link to="/" className="mb-6 flex items-center gap-2">
-        <span className="grid h-10 w-10 place-items-center rounded-xl bg-navy font-black text-accent">Z</span>
-        <span className="text-2xl font-bold text-slate-900">ShopZone</span>
+      <Link to="/" className="mb-6 flex items-center gap-2 text-slate-900">
+        <span className="grid h-10 w-10 place-items-center rounded-xl bg-navy pb-0.5">
+          <span className="text-xl font-bold leading-none text-white">a</span>
+        </span>
+        <AmezonLogo />
       </Link>
       <div className="w-full rounded-xl border border-gray-200 bg-white p-8 shadow-md">
         <h1 className="mb-1 text-xl font-bold text-slate-900">{title}</h1>
@@ -53,7 +56,7 @@ export function LoginPage() {
   }
 
   return (
-    <AuthCard title="Log in" subtitle="Welcome back to ShopZone">
+    <AuthCard title="Log in" subtitle="Welcome back to Amezon">
       <form onSubmit={onSubmit} className="space-y-4">
         <Input
           label="Email"
@@ -83,7 +86,7 @@ export function LoginPage() {
         </Button>
       </form>
       <p className="mt-5 text-center text-sm text-slate-600">
-        New to ShopZone?{" "}
+        New to Amezon?{" "}
         <Link to="/register" className="font-medium text-accent hover:underline">
           Create an account
         </Link>
@@ -170,7 +173,7 @@ export function RegisterPage() {
           </div>
         )}
         <Button type="submit" loading={busy} className="w-full" size="lg">
-          Create your ShopZone account
+          Create your Amezon account
         </Button>
       </form>
       <p className="mt-5 text-center text-sm text-slate-600">

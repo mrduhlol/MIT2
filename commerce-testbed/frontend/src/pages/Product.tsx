@@ -88,7 +88,7 @@ export function ProductPage() {
           <Badge color="amber" className="w-fit">{product.category}</Badge>
           <h1 className="mt-2 text-2xl font-bold text-slate-900">{product.name}</h1>
           <p className="mt-1 text-sm text-slate-500">
-            Sold by ShopZone · <span className="text-green-700">In stock</span>
+            Sold by Amezon · <span className="text-green-700">In stock</span>
           </p>
 
           <div className="my-4 border-y border-gray-100 py-4">
@@ -132,7 +132,7 @@ export function ProductPage() {
                 +
               </button>
             </div>
-            <Button size="lg" loading={busy} onClick={onAdd}>
+            <Button size="lg" variant="cta" loading={busy} onClick={onAdd}>
               {added ? "✓ Added to cart" : "Add to cart"}
             </Button>
             {added && (
