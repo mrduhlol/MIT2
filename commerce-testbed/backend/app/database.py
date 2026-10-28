@@ -1,8 +1,10 @@
 import os
+from contextvars import ContextVar, Token
 from typing import Iterator
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy.pool import NullPool
 
 from .config import get_settings
 from .models import Base, Product
@@ -17,10 +19,57 @@ engine = create_engine(
 )
 
 SessionLocal = sessionmaker(bind=engine, autoflush=False, expire_on_commit=False)
+_worker_mode = False
+_worker_hyperdrive: ContextVar[object | None] = ContextVar(
+    "commerce_testbed_hyperdrive", default=None
+)
+_database_initialized = False
+
+
+def configure_hyperdrive() -> None:
+    """Configure SQLAlchemy to open PostgreSQL connections through Hyperdrive."""
+    global engine, _worker_mode
+
+    import psycopg
+
+    def connect_from_hyperdrive():
+        binding = _worker_hyperdrive.get()
+        if binding is None:
+            raise RuntimeError("Hyperdrive is unavailable for this request")
+        return psycopg.connect(
+            host=binding.host,
+            port=int(binding.port),
+            user=binding.user,
+            password=binding.password,
+            dbname=binding.database,
+            sslmode="disable",
+        )
+
+    engine = create_engine(
+        "postgresql+psycopg://",
+        creator=connect_from_hyperdrive,
+        poolclass=NullPool,
+    )
+    SessionLocal.configure(bind=engine)
+    _worker_mode = True
+
+
+def bind_hyperdrive(binding: object) -> Token[object | None]:
+    return _worker_hyperdrive.set(binding)
+
+
+def reset_hyperdrive(token: Token[object | None]) -> None:
+    _worker_hyperdrive.reset(token)
+
+
+def is_worker_mode() -> bool:
+    return _worker_mode
 
 
 def _sqlite_path() -> str | None:
     """Extract filesystem path from a sqlite URL, or None (memory/other dialect)."""
+    if engine.dialect.name != "sqlite":
+        return None
     url = _settings.DATABASE_URL
     prefix = "sqlite:///"
     if not url.startswith(prefix):
@@ -40,11 +89,22 @@ def init_db() -> None:
 
     from . import seed_data  # noqa: F401  (ensures module importable)
 
-    Base.metadata.create_all(engine)
+    with engine.begin() as connection:
+        if connection.dialect.name == "postgresql":
+            # Serialize schema/catalog setup across simultaneously starting Workers.
+            connection.execute(text("SELECT pg_advisory_xact_lock(73420819)"))
+        Base.metadata.create_all(connection)
+        with Session(bind=connection, expire_on_commit=False) as db:
+            if db.query(Product).count() == 0:
+                _seed_products(db)
 
-    with SessionLocal() as db:
-        if db.query(Product).count() == 0:
-            _seed_products(db)
+
+def ensure_db_initialized() -> None:
+    """Initialize once on the first Worker request, when bindings are available."""
+    global _database_initialized
+    if not _database_initialized:
+        init_db()
+        _database_initialized = True
 
 
 def _seed_products(db: Session) -> None:

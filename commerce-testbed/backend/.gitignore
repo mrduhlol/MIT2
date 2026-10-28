@@ -6,3 +6,18 @@ __pycache__/
 # Local databases (regenerated on startup: products reseeded; simulate.py
 # or app usage creates the data file itself)
 data/*.db
+
+# Cloudflare local state and secrets
+.wrangler/
+.dev.vars*
+.env*
+!.env.example
+
+.venv-workers/
+python_modules/
+
+node_modules/
+build/
+*.egg-info/
+
+.worker-build/

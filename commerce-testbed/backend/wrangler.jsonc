@@ -1,0 +1,44 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "frontend",
+  "main": ".worker-build/worker.py",
+  "compatibility_date": "2026-10-28",
+  "compatibility_flags": [
+    "python_workers"
+  ],
+  "workers_dev": true,
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1,
+    "logs": {
+      "enabled": true
+    },
+    "traces": {
+      "enabled": true,
+      "head_sampling_rate": 1
+    }
+  },
+  "assets": {
+    "directory": "../frontend/dist",
+    "binding": "ASSETS",
+    "run_worker_first": [
+      "/api",
+      "/api/*",
+      "/health",
+      "/docs",
+      "/docs/*",
+      "/openapi.json",
+      "/redoc"
+    ],
+    "not_found_handling": "single-page-application"
+  },
+  "hyperdrive": [
+    {
+      "binding": "HYPERDRIVE",
+      "id": "CREATE_HYPERDRIVE_AND_REPLACE_THIS_ID"
+    }
+  ],
+  "build": {
+    "command": "python3 scripts/build_worker.py"
+  }
+}

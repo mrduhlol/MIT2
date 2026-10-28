@@ -4,7 +4,7 @@ This repo hosts the **commerce-testbed**: a full-stack e-commerce application us
 target/test environment for an AI Cyber Defense Agent project. It is intentionally kept separate
 from any SOC dashboard.
 
-➡️ See [`commerce-testbed/README.md`](./commerce-testbed/README.md) for the full overview,
+➡️ See [`commerce-testbed/backend/README.md`](./commerce-testbed/backend/README.md) for the full overview,
 architecture, and setup instructions.
 
 ## Quick start (two terminals)
@@ -13,7 +13,7 @@ architecture, and setup instructions.
 # 1) Backend (FastAPI + SQLite) on http://localhost:8000
 cd commerce-testbed/backend
 python -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
+pip install ".[local]"
 uvicorn app.main:app --reload --port 8000
 # API docs: http://localhost:8000/docs
 
@@ -23,42 +23,54 @@ npm install
 npm run dev
 ```
 
-## Deploy the website to Cloudflare
+## Deploy the full app to Cloudflare
 
 The screenshot's error happened because `wrangler deploy` was run from the repository root,
-which has no Cloudflare project configuration. The deployable site is in
-`commerce-testbed/frontend`; this project is configured with Cloudflare's `cf` CLI and Vite
-plugin. From the frontend directory:
+which had no deployment config. The frontend has since been deployed to
+<https://frontend.abhishek-a2534.workers.dev>. It currently serves the UI only. The full deploy
+will run FastAPI and the React assets together in one Python Worker, so the app uses that same
+Cloudflare-provided URL for both pages and `/api`.
+
+FastAPI needs persistent PostgreSQL; the local SQLite file is not durable on Workers. Create a
+PostgreSQL database (a Neon free project works for the hackathon), then create a Hyperdrive
+configuration in the Cloudflare dashboard using that database's connection details. Keep the
+database password in the provider/dashboard; do not put it in chat or commit it. Copy the
+Hyperdrive configuration ID into `commerce-testbed/backend/wrangler.jsonc`, replacing
+`CREATE_HYPERDRIVE_AND_REPLACE_THIS_ID`.
+
+From `commerce-testbed/backend`, install `uv` if needed, then deploy:
 
 ```bash
-cd commerce-testbed/frontend
+npm ci
+uv sync --group dev
+uv run pywrangler deploy --dry-run
+uv run pywrangler secret put SECRET_KEY
+uv run pywrangler secret put AGENT_API_KEY
+```
+
+Each secret command prompts for its value. Use a randomly generated JWT key and a separate random
+agent key. Then build the frontend and publish the full stack:
+
+```bash
+cd ../frontend
 npm install
-npm run deploy:dry-run
-npm run deploy
+npm run build:assets
+cd ../backend
+uv run pywrangler deploy
 ```
 
-Sign in first with `cf auth login` if `cf auth whoami` says you are not authenticated. After the
-first deploy, open **Workers & Pages → frontend → Settings → Domains & Routes → Add → Custom
-Domain** in the Cloudflare dashboard and add your domain. The domain's DNS zone must be active in
-the same Cloudflare account. Cloudflare will provision HTTPS for the custom domain.
+The dry run validates packaging only; verify `/health`, registration/login, carts, orders, and
+API-key access on the deployed URL before treating the backend as working. Existing local
+SQLite accounts are not automatically migrated to PostgreSQL.
 
-The React site and FastAPI API are separate services. FastAPI with SQLite cannot be made
-persistent just by uploading the frontend to Cloudflare. Deploy the backend to a Python host with
-persistent storage (preferably PostgreSQL), then set `VITE_API_BASE_URL` to its HTTPS origin when
-building the frontend, and set backend `CORS_ORIGINS` to the frontend's exact HTTPS origin. For
-local development, leave `VITE_API_BASE_URL` unset; Vite continues proxying `/api` to localhost.
-The backend reads `CORS_ORIGINS` as a comma-separated list and defaults to `http://localhost:5173`.
+The deploy updates the existing `frontend` Worker at
+<https://frontend.abhishek-a2534.workers.dev>. API docs will be at `/docs` and health at `/health`.
+After the full app works, add a custom domain from **Workers & Pages → frontend → Settings →
+Domains & Routes → Add → Custom Domain**. The domain's DNS zone must be active in the same
+Cloudflare account; Cloudflare provisions HTTPS.
 
-Example production build after the API is available:
-
-```bash
-cd commerce-testbed/frontend
-VITE_API_BASE_URL=https://api.your-domain.example npm run build
-npm run deploy
-```
-
-Replace the example host with the actual API URL. Deploying only the frontend before the API is
-available will publish the pages, but login, browsing, and checkout will not work yet.
+For local development, continue to run FastAPI with SQLite and the React Vite dev server. The
+Vite `/api` proxy remains pointed at `localhost:8000` unless `API_PROXY_TARGET` is set.
 
 ## Generate synthetic activity & incidents
 

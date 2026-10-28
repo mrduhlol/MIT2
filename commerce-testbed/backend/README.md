@@ -12,7 +12,7 @@ failed logins are recorded only as a SHA-256 hash prefix.
 ## Stack
 
 - FastAPI (sync endpoints), SQLAlchemy 2.0 ORM, SQLite (`backend/data/app.db`)
-- Pydantic v2 + pydantic-settings, PyJWT (HS256 access tokens), passlib/bcrypt
+- Pydantic v2 + pydantic-settings, PyJWT (HS256 access tokens), bcrypt
 - uvicorn, pytest + httpx for tests
 
 ## Setup
@@ -21,7 +21,7 @@ failed logins are recorded only as a SHA-256 hash prefix.
 cd backend
 python3 -m venv .venv
 source .venv/bin/activate
-pip install -r requirements.txt
+pip install ".[local]"
 ```
 
 On first start the app creates `data/app.db` and seeds ~40 demo products.
@@ -35,6 +35,18 @@ uvicorn app.main:app --reload --port 8000
 
 - Interactive docs: http://localhost:8000/docs
 - Health: `GET /api/security/health` (also `GET /health`)
+
+## Deploy on Cloudflare Workers
+
+`worker.py` exposes this FastAPI app through Cloudflare's Python Workers ASGI adapter. Cloudflare serves
+the React assets directly, and the app uses the `HYPERDRIVE` binding for
+persistent PostgreSQL. Do not deploy the local SQLite database file to Workers.
+
+Create a PostgreSQL database and a Hyperdrive configuration in Cloudflare, then replace the
+placeholder Hyperdrive ID in `wrangler.jsonc`. Set the two runtime secrets with `pywrangler
+secret put` and deploy from this directory; the root README has the full command sequence.
+Tables and the product catalog initialize on the first request. Local development still uses
+SQLite and the usual `uvicorn` command above.
 
 ## Environment variables (optional; dev defaults exist but MUST be changed for real use)
 

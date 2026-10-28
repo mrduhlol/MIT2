@@ -9,7 +9,8 @@
     "lint": "oxlint",
     "preview": "vite preview",
     "deploy": "cf deploy",
-    "deploy:dry-run": "cf deploy --dry-run"
+    "deploy:dry-run": "cf deploy --dry-run",
+    "build:assets": "tsc -b && vite build --mode standalone"
   },
   "dependencies": {
     "react": "^19.3.1",

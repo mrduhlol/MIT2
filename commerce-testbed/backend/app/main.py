@@ -9,8 +9,14 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from .api_keys import RateLimitExceeded, rate_limit_exception_handler
 from .audit_middleware import RequestIDMiddleware, access_denied_exception_handler
-from .config import get_settings
-from .database import init_db
+from .config import Settings, get_settings, reset_request_settings, set_request_settings
+from .database import (
+    bind_hyperdrive,
+    ensure_db_initialized,
+    init_db,
+    is_worker_mode,
+    reset_hyperdrive,
+)
 from .routers import auth, cart, events, orders, products, users
 from .routers import api_keys as api_keys_router
 from .routers import security as security_router
@@ -18,7 +24,8 @@ from .routers import security as security_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    init_db()
+    if not is_worker_mode():
+        init_db()
     yield
 
 
@@ -34,6 +41,31 @@ app = FastAPI(
 )
 
 app.add_middleware(RequestIDMiddleware)
+
+
+if is_worker_mode():
+    from starlette.middleware.base import BaseHTTPMiddleware
+
+    class WorkerBindingsMiddleware(BaseHTTPMiddleware):
+        async def dispatch(self, request, call_next):
+            env = request.scope["env"]
+            settings_token = set_request_settings(
+                Settings(
+                    SECRET_KEY=env.SECRET_KEY,
+                    AGENT_API_KEY=env.AGENT_API_KEY,
+                    DATABASE_URL="hyperdrive",
+                    CORS_ORIGINS="",
+                )
+            )
+            database_token = bind_hyperdrive(env.HYPERDRIVE)
+            try:
+                ensure_db_initialized()
+                return await call_next(request)
+            finally:
+                reset_hyperdrive(database_token)
+                reset_request_settings(settings_token)
+
+    app.add_middleware(WorkerBindingsMiddleware)
 
 app.add_middleware(
     CORSMiddleware,
