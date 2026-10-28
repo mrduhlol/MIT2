@@ -1,4 +1,5 @@
 const TOKEN_KEY = "ct_token";
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL ?? "").replace(/\/$/, "");
 
 export function getToken(): string | null {
   return localStorage.getItem(TOKEN_KEY);
@@ -81,7 +82,7 @@ export async function api<T>(path: string, options: ApiOptions = {}): Promise<T>
 
   let res: Response;
   try {
-    res = await fetch(path, {
+    res = await fetch(`${API_BASE_URL}${path}`, {
       method,
       headers,
       body: body !== undefined ? JSON.stringify(body) : undefined,

@@ -23,6 +23,43 @@ npm install
 npm run dev
 ```
 
+## Deploy the website to Cloudflare
+
+The screenshot's error happened because `wrangler deploy` was run from the repository root,
+which has no Cloudflare project configuration. The deployable site is in
+`commerce-testbed/frontend`; this project is configured with Cloudflare's `cf` CLI and Vite
+plugin. From the frontend directory:
+
+```bash
+cd commerce-testbed/frontend
+npm install
+npm run deploy:dry-run
+npm run deploy
+```
+
+Sign in first with `cf auth login` if `cf auth whoami` says you are not authenticated. After the
+first deploy, open **Workers & Pages → frontend → Settings → Domains & Routes → Add → Custom
+Domain** in the Cloudflare dashboard and add your domain. The domain's DNS zone must be active in
+the same Cloudflare account. Cloudflare will provision HTTPS for the custom domain.
+
+The React site and FastAPI API are separate services. FastAPI with SQLite cannot be made
+persistent just by uploading the frontend to Cloudflare. Deploy the backend to a Python host with
+persistent storage (preferably PostgreSQL), then set `VITE_API_BASE_URL` to its HTTPS origin when
+building the frontend, and set backend `CORS_ORIGINS` to the frontend's exact HTTPS origin. For
+local development, leave `VITE_API_BASE_URL` unset; Vite continues proxying `/api` to localhost.
+The backend reads `CORS_ORIGINS` as a comma-separated list and defaults to `http://localhost:5173`.
+
+Example production build after the API is available:
+
+```bash
+cd commerce-testbed/frontend
+VITE_API_BASE_URL=https://api.your-domain.example npm run build
+npm run deploy
+```
+
+Replace the example host with the actual API URL. Deploying only the frontend before the API is
+available will publish the pages, but login, browsing, and checkout will not work yet.
+
 ## Generate synthetic activity & incidents
 
 ```bash

@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     AGENT_API_KEY: str = "agent-dev-key-change-me"
     DATABASE_URL: str = "sqlite:///./data/app.db"
+    CORS_ORIGINS: str = "http://localhost:5173"
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 

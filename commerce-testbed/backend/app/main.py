@@ -9,6 +9,7 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from .api_keys import RateLimitExceeded, rate_limit_exception_handler
 from .audit_middleware import RequestIDMiddleware, access_denied_exception_handler
+from .config import get_settings
 from .database import init_db
 from .routers import auth, cart, events, orders, products, users
 from .routers import api_keys as api_keys_router
@@ -36,7 +37,11 @@ app.add_middleware(RequestIDMiddleware)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=[
+        origin.strip()
+        for origin in get_settings().CORS_ORIGINS.split(",")
+        if origin.strip()
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

@@ -44,6 +44,13 @@ uvicorn app.main:app --reload --port 8000
 | `ACCESS_TOKEN_EXPIRE_MINUTES` | `30` | Access token lifetime |
 | `AGENT_API_KEY` | `agent-dev-key-change-me` | Key for `/api/events/feed` |
 | `DATABASE_URL` | `sqlite:///./data/app.db` | SQLAlchemy DB URL |
+| `CORS_ORIGINS` | `http://localhost:5173` | Comma-separated exact browser origins allowed to call the API |
+
+For a hosted frontend, set `CORS_ORIGINS` to its HTTPS origin (for example,
+`https://your-worker.workers.dev`). Do not include a path or trailing slash. For multiple
+frontends, separate exact origins with commas. Set `VITE_API_BASE_URL` in the frontend build to
+the API's HTTPS origin (for example, `https://api.example.com`); leave it unset for local Vite
+development, which proxies `/api` to `localhost:8000`.
 
 ## Generate synthetic data & incidents
 
